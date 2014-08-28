@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="_3rd">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="_3rd\libevent">
+      <UniqueIdentifier>{ab66210d-4c86-4ca5-89e2-2f1c159295fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_3rd\libiconv">
+      <UniqueIdentifier>{f95524bd-fdfc-481a-9b0e-ca968a9d1813}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="include\memory">
+      <UniqueIdentifier>{d6a60283-54ba-4def-bcde-e554754477a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\thread">
+      <UniqueIdentifier>{d233678e-1fe8-4a90-a107-077bb293446e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\utility">
+      <UniqueIdentifier>{483237a8-f5e7-4b08-892b-5614bb586e43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\utility">
+      <UniqueIdentifier>{005d52b9-8b14-4425-bd59-aa9db4ee7318}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\memory">
+      <UniqueIdentifier>{2bc43cc8-7170-4247-8f03-789628b96128}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{de6b4851-349e-4659-a5e1-d87b909381b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\md5">
+      <UniqueIdentifier>{80905cdd-8c95-4b69-a8f7-ced0c47c7894}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\md5">
+      <UniqueIdentifier>{246421df-db28-438c-9374-0274748dc4cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_3rd\liblog4cplus">
+      <UniqueIdentifier>{d629d97a-effe-4776-b17d-4c214ac369c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\log">
+      <UniqueIdentifier>{c4640d42-fb19-40b2-980a-291b11bab062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\log">
+      <UniqueIdentifier>{d0eafed4-89db-4151-984b-8e048962306e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\exception">
+      <UniqueIdentifier>{16ce6030-3720-4cb3-9c76-94523dd559d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\exception">
+      <UniqueIdentifier>{993aadfc-d5f8-4179-8f54-31773cfba760}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\ref">
+      <UniqueIdentifier>{dcfa0d4b-fa65-4a97-b279-2c20391c1c87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\net">
+      <UniqueIdentifier>{334312e1-844a-4ce4-ac79-c2407b1094a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\net">
+      <UniqueIdentifier>{9a514fe2-a82e-45d0-a48c-1c8658218706}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\stdhead.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xhguard.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xhhead.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xhlog.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\memory\mpage.h">
+      <Filter>include\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\memory\mpagemgr.h">
+      <Filter>include\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\memory\mpool.h">
+      <Filter>include\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\memory\opool.h">
+      <Filter>include\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\thread\nullmutex.h">
+      <Filter>include\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\utility\utility.h">
+      <Filter>include\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\md5\md5.h">
+      <Filter>include\md5</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3_libiconv-win32\include\iconv.h">
+      <Filter>_3rd\libevent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3_log4cplus-win32\include\log4cplus\appender.h">
+      <Filter>_3rd\liblog4cplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3_log4cplus-win32\include\log4cplus\fileappender.h">
+      <Filter>_3rd\liblog4cplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3_log4cplus-win32\include\log4cplus\layout.h">
+      <Filter>_3rd\liblog4cplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3_log4cplus-win32\include\log4cplus\logger.h">
+      <Filter>_3rd\liblog4cplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3_log4cplus-win32\include\log4cplus\loglevel.h">
+      <Filter>_3rd\liblog4cplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3_log4cplus-win32\include\log4cplus\consoleappender.h">
+      <Filter>_3rd\liblog4cplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\log\filelog.h">
+      <Filter>include\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\log\stacktrace.h">
+      <Filter>include\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\log\actionstat.h">
+      <Filter>include\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xhutility.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\exception\smart_assert.h">
+      <Filter>include\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\exception\ensure.h">
+      <Filter>include\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xhexception.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\exception\StackWalker.h">
+      <Filter>include\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\exception\traceback.h">
+      <Filter>include\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ref\cppref.h">
+      <Filter>include\ref</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xhnet.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xhref.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\net\iobuffer.h">
+      <Filter>include\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\net\ioserver.h">
+      <Filter>include\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\net\tcpsocket.h">
+      <Filter>include\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\net\timer.h">
+      <Filter>include\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\net\udpsocket.h">
+      <Filter>include\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\net\impl_ioserver.h">
+      <Filter>source\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\net\impl_tcpsocket.h">
+      <Filter>source\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\net\impl_timer.h">
+      <Filter>source\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\net\impl_udpsocket.h">
+      <Filter>source\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\net\impl_nethead.h">
+      <Filter>source\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xh.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xhpool.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\utility\utility.cpp">
+      <Filter>source\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\memory\mpage.cpp">
+      <Filter>source\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\memory\mpagemgr.cpp">
+      <Filter>source\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\test.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\md5\md5.cpp">
+      <Filter>source\md5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\log\filelog.cpp">
+      <Filter>source\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\log\stacktrace.cpp">
+      <Filter>source\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\log\actionstat.cpp">
+      <Filter>source\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\exception\smart_assert.cpp">
+      <Filter>source\exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\exception\ensure.cpp">
+      <Filter>source\exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\exception\StackWalker.cpp">
+      <Filter>source\exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\exception\traceback.cpp">
+      <Filter>source\exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\net\impl_ioserver.cpp">
+      <Filter>source\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\net\impl_tcpsocket.cpp">
+      <Filter>source\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\net\impl_timer.cpp">
+      <Filter>source\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\net\impl_udpsocket.cpp">
+      <Filter>source\net</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
