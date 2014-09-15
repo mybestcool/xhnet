@@ -2,6 +2,7 @@
 #pragma once
 
 #include <queue>
+#include <unordered_map>
 #include <xhhead.h>
 #include <xhnet.h>
 #include <xhutility.h>
@@ -21,7 +22,7 @@
 #define SOCKET_ERROR	-1
 #endif
 
-#include <event.h>
+#include <libevent/include/event.h>
 
 namespace xhnet
 {

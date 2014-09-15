@@ -12,7 +12,7 @@
 
 #if defined _PLATFORM_WINDOWS_
 
-#include <exception/StackWalker.h>
+#include "StackWalker.h"
 #include <eh.h>
 #include <tchar.h>
 #include <time.h>
@@ -74,7 +74,7 @@ namespace xhnet
 
 	void open_exception_translator()
 	{
-		_set_se_translator(trans_func);
+		::_set_se_translator(trans_func);
 	}
 
 	class CMiniFileDump

@@ -5,18 +5,18 @@
 #include "xhlog.h"
 
 
-#include <log4cplus/consoleappender.h>
-#include <log4cplus/fileappender.h>
-#include <log4cplus/layout.h>
+#include <log4cplus/include/log4cplus/consoleappender.h>
+#include <log4cplus/include/log4cplus/fileappender.h>
+#include <log4cplus/include/log4cplus/layout.h>
 
 #if defined _PLATFORM_WINDOWS_
 #ifdef _DEBUG
-#pragma comment( lib, "log4cplusD.lib" )
+#pragma comment( lib, "log4cplus/lib/log4cplusD.lib" )
 #else
-#pragma comment( lib, "log4cplus.lib" )
+#pragma comment( lib, "log4cplus/lib/log4cplus.lib" )
 #endif
 #elif defined _PLATFORM_LINUX_
-#pragma comment( lib, "log4cplus" )
+#pragma comment( lib, "log4cplus/lib/log4cplus" )
 #endif
 
 using namespace log4cplus;

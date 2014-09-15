@@ -3,7 +3,8 @@
 
 
 #include <set>
-#include <map>
+//#include <map>
+#include <unordered_map>
 //#include <hash_map>
 //#include <ext/hash_map>
 #include <list>
@@ -13,7 +14,7 @@
 
 // 提高效率可以使用hash系列
 #define xh_page_set		std::set
-#define xh_page_map		std::map
+#define xh_page_map		std::unordered_map
 //#define xh_page_map		stdext::hash_map
 //#define xh_page_map		__gnu_cxx::hash_map
 #define xh_page_list	std::list

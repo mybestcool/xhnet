@@ -2,16 +2,15 @@
 #include "impl_ioserver.h"
 
 #include <xhlog.h>
-
-#include <event.h>
+#include <xhexception.h>
 
 #if defined _PLATFORM_WINDOWS_
-#pragma comment( lib, "libevent_core.lib" )
-#pragma comment( lib, "libevent_extras.lib" )
+#pragma comment( lib, "libevent/lib/libevent_core.lib" )
+#pragma comment( lib, "libevent/lib/libevent_extras.lib" )
 #pragma comment( lib,"ws2_32.lib" )
 #elif defined _PLATFORM_LINUX_
-#pragma comment( lib, "libevent_core" )
-#pragma comment( lib, "libevent_extras" )
+#pragma comment( lib, "libevent/lib/libevent_core" )
+#pragma comment( lib, "libevent/lib/libevent_extras" )
 #endif
 
 
@@ -197,13 +196,22 @@ namespace xhnet
 	{
 		if (!m_binit || m_status == status_null)
 			return;
+		XH_OPEN_CETRANS();
 
 		real_post(false);
 
-		while (m_status==status_common)
+		while (m_status == status_common)
 		{
-			event_base_loop(m_evbase, EVLOOP_NONBLOCK);
+			try
+			{
+				event_base_loop(m_evbase, EVLOOP_NONBLOCK);
+			}
+			catch (...)
+			{
+				XH_LOG_ERROR(logname_base, "IOServer Run catch err");
+			}
 		}
+
 
 		//event_base_dispatch(m_evbase);
 	}

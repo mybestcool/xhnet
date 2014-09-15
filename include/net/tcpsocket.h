@@ -50,8 +50,8 @@ namespace xhnet
 	// 1、任何socket Init以后，都需要调用Fini来结束，
 	// 2、socket调用Fini主动关闭（tcp_close_bylocal），还是socket本身的原因关闭，都会调用On_Close
 	// 3、Fini可以多次调用，Fini以后需要重用额话则需再次Init
-	// 4、socket在回调On_Close的时候，未被调用过Fini，则可以再次Listen、Connect、Async_Accept
-	// 5、Async_Accept、Async_Send、Async_Recv、Async_RecvSome只有在回调On_Listen、On_Connect、On_Connect成功的时候才有效果，即socket进入common状态
+	// 4、socket在回调On_Close的时候，未被调用过Fini，则可以再次Listen、Connect
+	// 5、Async_Send、Async_Recv、Async_RecvSome只有在回调On_Listen、On_Connect、On_Connect成功的时候才有效果，即socket进入common状态
 	//
 	//
 	//

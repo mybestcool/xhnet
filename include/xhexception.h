@@ -2,7 +2,6 @@
 #pragma once
 
 
-#include <exception/ensure.h>
 #include <exception/traceback.h>
 
 

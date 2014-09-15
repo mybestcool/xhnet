@@ -1,6 +1,9 @@
 
+//#define SMART_ASSERT_DEBUG_MODE	1
+#include "smart_assert.h"
+
 #include <sstream>
-#include <exception/ensure.h>
+#include "ensure.h"
 #include <xhlog.h>
 
 namespace xhnet
@@ -41,7 +44,7 @@ namespace xhnet
 		//什么都不做
 	}
 
-	CInsureInit g_init_insure;
+	static CInsureInit sf_init_insure;
 
 	CInsureInit::CInsureInit()
 	{

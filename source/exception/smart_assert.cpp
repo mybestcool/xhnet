@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#include "exception/smart_assert.h"
+#include "smart_assert.h"
 
 
 #include <fstream>

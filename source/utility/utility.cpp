@@ -20,11 +20,11 @@
 #include <direct.h>
 #include <io.h>
 
-#include <iconv.h>
+#include <libiconv/include/iconv.h>
 #ifdef _DEBUG
-#pragma comment( lib, "iconvD.lib" )
+#pragma comment( lib, "libiconv/lib/iconvD.lib" )
 #else
-#pragma comment( lib, "iconv.lib" )
+#pragma comment( lib, "libiconv/lib/iconv.lib" )
 #endif // _DEBUG
 
 #elif defined _PLATFORM_LINUX_

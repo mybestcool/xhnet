@@ -90,7 +90,7 @@
 
 #if defined _PLATFORM_WINDOWS_
 
-#include <exception/StackWalker.h>
+#include "StackWalker.h"
 
 
 // If VC7 and later, then use the shipped 'dbghelp.h'-file

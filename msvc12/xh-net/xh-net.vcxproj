@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{92ECB11B-D0DF-4B6B-AEF9-BA4E3A29435D}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>xhnet</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../include;../../dependencies/windows;../../dependencies/windows/libevent/include;../../dependencies/windows/libiconv/include;../../dependencies/windows/log4cplus/include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>../../dependencies/windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../include;../../dependencies/windows;../../dependencies/windows/libevent/include;../../dependencies/windows/libiconv/include;../../dependencies/windows/log4cplus/include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>../../dependencies/windows</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dependencies\windows\libevent\include\event.h" />
+    <ClInclude Include="..\..\dependencies\windows\libiconv\include\iconv.h" />
+    <ClInclude Include="..\..\dependencies\windows\log4cplus\include\log4cplus\appender.h" />
+    <ClInclude Include="..\..\dependencies\windows\log4cplus\include\log4cplus\fileappender.h" />
+    <ClInclude Include="..\..\dependencies\windows\log4cplus\include\log4cplus\layout.h" />
+    <ClInclude Include="..\..\dependencies\windows\log4cplus\include\log4cplus\logger.h" />
+    <ClInclude Include="..\..\dependencies\windows\log4cplus\include\log4cplus\loglevel.h" />
+    <ClInclude Include="..\..\dependencies\windows\log4cplus\include\log4cplus\win32consoleappender.h" />
+    <ClInclude Include="..\..\include\exception\traceback.h" />
+    <ClInclude Include="..\..\include\log\actionstat.h" />
+    <ClInclude Include="..\..\include\log\filelog.h" />
+    <ClInclude Include="..\..\include\log\stacktrace.h" />
+    <ClInclude Include="..\..\include\md5\md5.h" />
+    <ClInclude Include="..\..\include\memory\mpage.h" />
+    <ClInclude Include="..\..\include\memory\mpagemgr.h" />
+    <ClInclude Include="..\..\include\memory\mpool.h" />
+    <ClInclude Include="..\..\include\memory\opool.h" />
+    <ClInclude Include="..\..\include\net\iobuffer.h" />
+    <ClInclude Include="..\..\include\net\ioserver.h" />
+    <ClInclude Include="..\..\include\net\tcpsocket.h" />
+    <ClInclude Include="..\..\include\net\timer.h" />
+    <ClInclude Include="..\..\include\net\udpsocket.h" />
+    <ClInclude Include="..\..\include\ref\cppref.h" />
+    <ClInclude Include="..\..\include\stdhead.h" />
+    <ClInclude Include="..\..\include\thread\nullmutex.h" />
+    <ClInclude Include="..\..\include\utility\utility.h" />
+    <ClInclude Include="..\..\include\xh.h" />
+    <ClInclude Include="..\..\include\xhexception.h" />
+    <ClInclude Include="..\..\include\xhguard.h" />
+    <ClInclude Include="..\..\include\xhhead.h" />
+    <ClInclude Include="..\..\include\xhlog.h" />
+    <ClInclude Include="..\..\include\xhnet.h" />
+    <ClInclude Include="..\..\include\xhpool.h" />
+    <ClInclude Include="..\..\include\xhref.h" />
+    <ClInclude Include="..\..\include\xhutility.h" />
+    <ClInclude Include="..\..\source\exception\ensure.h" />
+    <ClInclude Include="..\..\source\exception\smart_assert.h" />
+    <ClInclude Include="..\..\source\exception\StackWalker.h" />
+    <ClInclude Include="..\..\source\net\impl_ioserver.h" />
+    <ClInclude Include="..\..\source\net\impl_nethead.h" />
+    <ClInclude Include="..\..\source\net\impl_tcpsocket.h" />
+    <ClInclude Include="..\..\source\net\impl_timer.h" />
+    <ClInclude Include="..\..\source\net\impl_udpsocket.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\exception\ensure.cpp" />
+    <ClCompile Include="..\..\source\exception\smart_assert.cpp" />
+    <ClCompile Include="..\..\source\exception\StackWalker.cpp" />
+    <ClCompile Include="..\..\source\exception\traceback.cpp" />
+    <ClCompile Include="..\..\source\log\actionstat.cpp" />
+    <ClCompile Include="..\..\source\log\filelog.cpp" />
+    <ClCompile Include="..\..\source\log\stacktrace.cpp" />
+    <ClCompile Include="..\..\source\md5\md5.cpp" />
+    <ClCompile Include="..\..\source\memory\mpage.cpp" />
+    <ClCompile Include="..\..\source\memory\mpagemgr.cpp" />
+    <ClCompile Include="..\..\source\net\impl_ioserver.cpp" />
+    <ClCompile Include="..\..\source\net\impl_tcpsocket.cpp" />
+    <ClCompile Include="..\..\source\net\impl_timer.cpp" />
+    <ClCompile Include="..\..\source\net\impl_udpsocket.cpp" />
+    <ClCompile Include="..\..\source\utility\utility.cpp" />
+    <ClCompile Include="..\..\test\test.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -70,9 +70,9 @@ namespace xhnet
 		// √ø∏Ù1∫¡√Î
 		ITimer*				m_posttimer;
 
-		std::map<unsigned int, ITcpSocket*> m_tcpsockets;
-		std::map<unsigned int, IUdpSocket*> m_udpsockets;
-		std::map<unsigned int, ITimer*> m_timers;
+		std::unordered_map<unsigned int, ITcpSocket*> m_tcpsockets;
+		std::unordered_map<unsigned int, IUdpSocket*> m_udpsockets;
+		std::unordered_map<unsigned int, ITimer*> m_timers;
 
 	private:
 		CIOServer(const CIOServer&) = delete;

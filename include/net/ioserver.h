@@ -12,7 +12,7 @@ namespace xhnet
 	typedef std::function<void()> postio;
 
 	//
-	// run/runonce 只能在一个线程中运行 one thread one run
+	// run 只能在一个线程中运行 one thread one run
 	//
 	class IIOServer : public CPPRef
 	{
