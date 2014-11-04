@@ -22,41 +22,46 @@ namespace xhnet
 		// 用来维护内存链表, 这个struct是为了提高可读性  
 		struct FreeBlock { FreeBlock* next; };
 
+		static unsigned long cast2uint(void* p)
+		{
+			return reinterpret_cast<unsigned long>(p);
+		}
+
 	public:
-		CMPage(unsigned int block_size, unsigned int align_size = DEFAULT_ALIGNSIZE);
+		CMPage(unsigned long block_size, unsigned long align_size = DEFAULT_ALIGNSIZE);
 		~CMPage(void);
 
 		CMPage(void) = delete;
 		CMPage(const CMPage&) = delete;
 		CMPage& operator=(const CMPage&) = delete;
 
-		bool Reset(unsigned int block_size, unsigned int align_size = DEFAULT_ALIGNSIZE);
+		bool Reset(unsigned long block_size, unsigned long align_size = DEFAULT_ALIGNSIZE);
 		void Clear(void);
 
 		void* Allocate(void);
 		void Free(void* ptr);
 
-		unsigned int Get_AlignSize(void)
+		unsigned long Get_AlignSize(void)
 		{
 			return m_align_size;
 		}
 
-		unsigned int Get_PageSize(void)
+		unsigned long Get_PageSize(void)
 		{
 			return m_page_size;
 		}
 
-		unsigned int Get_BlockSize(void)
+		unsigned long Get_BlockSize(void)
 		{
 			return m_block_size;
 		}
 
-		unsigned int Get_AllBlockNum(void)
+		unsigned long Get_AllBlockNum(void)
 		{
 			return m_allblock_num;
 		}
 
-		unsigned int Get_FreeBlockNum(void)
+		unsigned long Get_FreeBlockNum(void)
 		{
 			return m_freeblock_num;
 		}
@@ -76,40 +81,40 @@ namespace xhnet
 		// 检测一个指针是否是在Pool中分配的, 用于防止错误释放  
 		bool Is_ContainsPointer(void* ptr)
 		{
-			return (unsigned int)ptr >= (unsigned int)m_memory &&
-				(unsigned int)ptr < (unsigned int)m_memory + m_block_size*m_allblock_num;
+			return cast2uint(ptr) >= cast2uint(m_memory) &&
+				cast2uint(ptr) < cast2uint(m_memory) + m_block_size*m_allblock_num;
 		}
 
-		static unsigned int Calc_AlignedSize(unsigned int block_size, unsigned int align_size);
-		static unsigned int Calc_PageSize(unsigned int block_size, unsigned int align_size, unsigned int aligned_block_size);
-		static unsigned int Calc_PageSize(unsigned int block_size, unsigned int align_size);
+		static unsigned long Calc_AlignedSize(unsigned long block_size, unsigned long align_size);
+		static unsigned long Calc_PageSize(unsigned long block_size, unsigned long align_size, unsigned long aligned_block_size);
+		static unsigned long Calc_PageSize(unsigned long block_size, unsigned long align_size);
 
 	private:
-		void create(unsigned int block_size, unsigned int align_size);
+		void create(unsigned long block_size, unsigned long align_size);
 		void destory(void);
 
 		FreeBlock* allocateblock();
 		void freeblock(FreeBlock* block);
 
-		bool isaligned(void* data, int alignment)
+		bool isaligned(void* data, long alignment)
 		{
 			// 又是一个经典算法, 参见<Hacker's Delight>  
-			return ((unsigned int)data & (alignment - 1)) == 0;
+			return (cast2uint(data) & (unsigned long)(alignment - 1)) == 0;
 		}
 
 	public:
 		// 内存管理
 		void*				m_memory;			// A pointer to the memory allocated for the entire pool                
 		FreeBlock*			m_freeblock_head;	// A pointer to the head of the linked list of free blocks  
-		unsigned int		m_freeblock_num;	// The current number of free blocks in the pool  
+		unsigned long		m_freeblock_num;	// The current number of free blocks in the pool  
 
 		// 总大小
-		unsigned int		m_allblock_num;		// All number of blocks in the pool
-		unsigned int		m_page_size;
+		unsigned long		m_allblock_num;		// All number of blocks in the pool
+		unsigned long		m_page_size;
 
 		// 每块内存大小和对齐长度
-		unsigned int		m_align_size;
-		unsigned int		m_block_size;		// The size in bytes of a block in the pool (this is only  
+		unsigned long		m_align_size;
+		unsigned long		m_block_size;		// The size in bytes of a block in the pool (this is only  
 												// stored so it can be used by Is_ContainsPointer() to   
 												// validate deallocation and so could be omitted in a release build) 
 	};

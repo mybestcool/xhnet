@@ -16,7 +16,7 @@
 #pragma comment( lib, "log4cplus/lib/log4cplus.lib" )
 #endif
 #elif defined _PLATFORM_LINUX_
-#pragma comment( lib, "log4cplus/lib/log4cplus" )
+//#pragma comment( lib, "log4cplus/lib/log4cplus.a" )
 #endif
 
 using namespace log4cplus;

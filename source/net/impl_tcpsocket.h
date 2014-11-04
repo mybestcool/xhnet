@@ -72,7 +72,7 @@ namespace xhnet
 		void real_fini();
 
 		void on_inter_listen_accept(evutil_socket_t listenfd);
-		void on_inter_accept_accept(evutil_socket_t fd, socketaddr* peeraddr, int addrlen);
+		void on_inter_accept_accept(evutil_socket_t fd, socketaddr* peeraddr, ev_socklen_t addrlen);
 		void on_inter_recv(short flag);
 		void on_inter_send(short flag);
 		void on_inter_close(int errid, bool bconnecting);

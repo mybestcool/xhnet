@@ -17,7 +17,7 @@ namespace xhnet
 
 	static unsigned int gen_timertid()
 	{
-		static std::atomic<unsigned int> gen_timerid = 0;
+		static std::atomic<unsigned int> gen_timerid(0);
 		return ++gen_timerid;
 	}
 

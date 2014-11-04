@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../xhhead.h"
+#include <xhhead.h>
 
 #include <string>
 #include <sstream>
@@ -33,10 +33,10 @@ namespace xhnet
 		is >> t;
 		return t;
 	}
-	int			Str2Int(const std::string& data, int default = 0);
-	std::string	Int2Str(int data, const std::string& default = "");
-	unsigned int Str2UInt(const std::string& data, unsigned int default = 0);
-	std::string	UInt2Str(unsigned int data, const std::string& default = "");
+	int			Str2Int(const std::string& data, int defaultvale = 0);
+	std::string	Int2Str(int data, const std::string& defaultvale = "");
+	unsigned int Str2UInt(const std::string& data, unsigned int defaultvale = 0);
+	std::string	UInt2Str(unsigned int data, const std::string& defaultvale = "");
 	// end ÀàĞÍ×ª»»
 
 	//

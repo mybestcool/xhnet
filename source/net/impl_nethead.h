@@ -15,8 +15,11 @@
 #elif defined _PLATFORM_LINUX_
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 
 #define INVALID_SOCKET	int(~0)
 #define SOCKET_ERROR	-1
@@ -26,9 +29,21 @@
 
 namespace xhnet
 {
-	typedef ifclass<struct sockaddr_in6, struct sockaddr_in, (sizeof(struct sockaddr_in6)>sizeof(struct sockaddr_in)) > socketaddr;
+	template<class S1, class S2, bool b>
+	struct ifadress
+	{
+		S1 m_addr;
+	};
 
-	inline bool ipport2sockaddr(const std::string& inip, unsigned int inport, socketaddr* outaddr, int& outaddrlen)
+	template<class S1, class S2>
+	struct ifadress < S1, S2, false >
+	{
+		S2 m_addr;
+	};
+
+	typedef ifadress<struct sockaddr_in6, struct sockaddr_in, (sizeof(struct sockaddr_in6)>sizeof(struct sockaddr_in)) > socketaddr;
+
+	inline bool ipport2sockaddr(const std::string& inip, unsigned int inport, socketaddr* outaddr, ev_socklen_t& outaddrlen)
 	{
 		int ret = -1;
 		// ipv4
@@ -39,7 +54,7 @@ namespace xhnet
 
 			int v4addrlen = sizeof(struct sockaddr_in);
 			ret = evutil_parse_sockaddr_port(tempaddr, (struct sockaddr*)outaddr, &v4addrlen);
-			outaddrlen = v4addrlen;
+			outaddrlen = (ev_socklen_t)v4addrlen;
 		}
 		else if (SplitString(inip, ":").size() == 6)
 		{
@@ -48,13 +63,13 @@ namespace xhnet
 
 			int v6addrlen = sizeof(struct sockaddr_in6);
 			ret = evutil_parse_sockaddr_port(tempaddr, (struct sockaddr*)outaddr, &v6addrlen);
-			outaddrlen = v6addrlen;
+			outaddrlen = (ev_socklen_t)v6addrlen;
 		}
 
 		return ret == 0;
 	}
 
-	inline bool sockaddr2ipport(socketaddr* inaddr, int inaddrlen, std::string& outip, unsigned int& outport)
+	inline bool sockaddr2ipport(socketaddr* inaddr, ev_socklen_t inaddrlen, std::string& outip, unsigned int& outport)
 	{
 		struct sockaddr* tempaddr = (struct sockaddr*)(inaddr);
 		if (tempaddr->sa_family == AF_INET)

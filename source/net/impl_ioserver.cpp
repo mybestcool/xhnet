@@ -1,6 +1,7 @@
 
 #include "impl_ioserver.h"
 
+#include <xhhead.h>
 #include <xhlog.h>
 #include <xhexception.h>
 
@@ -9,8 +10,8 @@
 #pragma comment( lib, "libevent/lib/libevent_extras.lib" )
 #pragma comment( lib,"ws2_32.lib" )
 #elif defined _PLATFORM_LINUX_
-#pragma comment( lib, "libevent/lib/libevent_core" )
-#pragma comment( lib, "libevent/lib/libevent_extras" )
+//#pragma comment( lib, "libevent/lib/libevent_core.a" )
+//#pragma comment( lib, "libevent/lib/libevent_extras.a" )
 #endif
 
 
@@ -42,7 +43,7 @@ namespace xhnet
 		//}
 
 		struct addrinfo* result = 0;
-		int ret = getaddrinfo(hostname.c_str(), NULL, NULL, &result);
+		/*int ret = */getaddrinfo(hostname.c_str(), NULL, NULL, &result);
 		for (struct addrinfo* it = result; it != 0; it = it->ai_next)
 		{
 			std::string ip;
@@ -244,7 +245,7 @@ namespace xhnet
 		int err = event_assign(ev, m_evbase, sock, flag, cb, p);
 		if ( err!=0 )
 		{
-			int test = 9;
+			//int test = 9;
 		}
 	}
 
@@ -254,7 +255,7 @@ namespace xhnet
 		int err = event_add(ev, timeout);
 		if ( err!=0 )
 		{
-			int test=10;
+			//int test=10;
 		}
 	}
 
@@ -264,7 +265,7 @@ namespace xhnet
 		int err = event_del(ev);
 		if ( err!=0 )
 		{
-			int test = 11;
+			//int test = 11;
 		}
 	}
 
@@ -376,7 +377,7 @@ namespace xhnet
 		{
 			std::lock_guard<std::mutex> guard(m_postmutex);
 			pcur = &(m_postdata[m_curpost]);
-			m_curpost = (++m_curpost) % 2;
+			m_curpost = (m_curpost+1) % 2;
 			m_haspostdata = false;
 		}
 

@@ -11,7 +11,7 @@
 #include "md5/md5.h"
 
 #include "xhguard.h"
-
+#include "xhhead.h"
 
 
 #if defined _PLATFORM_WINDOWS_
@@ -34,26 +34,31 @@
 #include <sys/time.h>
 #include <sys/sysinfo.h>
 #include <dlfcn.h>
+#include <string.h>
 
 #include <iconv.h>
-#pragma comment( lib, "libiconv" )
+//#pragma comment( lib, "libiconv.a" )
 
 #include <uuid/uuid.h>
-#pragma comment( lib, "libuuid")
+//#pragma comment( lib, "libuuid.a")
 #endif
 
 namespace xhnet
 {
 	// 编码转换
 	//
-	bool Convert_String(const char* in, unsigned int inlen, char* out, unsigned int outlen, const std::string &to_encoding, const std::string &from_encoding)
+	bool Convert_String(char* in, size_t inlen, char* out, size_t outlen, const std::string &to_encoding, const std::string &from_encoding)
 	{
 		iconv_t h = iconv_open(to_encoding.c_str(), from_encoding.c_str());
 		if (iconv_t(-1) == h) return false;
 
 		XH_GUARD([&]{ iconv_close(h); });
 
-		if (size_t(-1) == iconv(h, (const char **)&in, &inlen, &out, &outlen))
+#if defined _PLATFORM_WINDOWS_
+		if (size_t(-1) == iconv(h, (const char**)&in, &inlen, &out, &outlen))
+#elif defined _PLATFORM_LINUX_
+		if (size_t(-1) == iconv(h, &in, &inlen, &out, &outlen))
+#endif
 		{
 			return false;
 		}
@@ -65,9 +70,9 @@ namespace xhnet
 
 	// 类型转换
 	//
-	int	Str2Int(const std::string& data, int default)
+	int	Str2Int(const std::string& data, int defaultvale)
 	{
-		int ret = default;
+		int ret = defaultvale;
 		try
 		{
 			S2T(data, ret);
@@ -79,9 +84,9 @@ namespace xhnet
 		return ret;
 	}
 
-	std::string	Int2Str(int data, const std::string& default)
+	std::string	Int2Str(int data, const std::string& defaultvale)
 	{
-		std::string ret = default;
+		std::string ret = defaultvale;
 		try
 		{
 			ret = T2S(data);
@@ -93,9 +98,9 @@ namespace xhnet
 		return ret;
 	}
 
-	unsigned int Str2UInt(const std::string& data, unsigned int default)
+	unsigned int Str2UInt(const std::string& data, unsigned int defaultvale)
 	{
-		unsigned int ret = default;
+		unsigned int ret = defaultvale;
 		try
 		{
 			S2T(data, ret);
@@ -107,9 +112,9 @@ namespace xhnet
 		return ret;
 	}
 
-	std::string	UInt2Str(unsigned int data, const std::string& default)
+	std::string	UInt2Str(unsigned int data, const std::string& defaultvale)
 	{
-		std::string ret = default;
+		std::string ret = defaultvale;
 		try
 		{
 			ret = T2S(data);
@@ -342,7 +347,8 @@ namespace xhnet
 		tm outtime;
 		localtime_s(&outtime, &intime);
 #elif defined _PLATFORM_LINUX_
-		tm outtime = *localtime_r(&intime);
+		tm outtime;
+		localtime_r(&intime, &outtime);
 #endif	
 		return outtime;
 	}
@@ -873,7 +879,7 @@ namespace xhnet
 #if defined _PLATFORM_WINDOWS_
 		void* dy = ::LoadLibraryA(path.c_str());
 #elif defined _PLATFORM_LINUX_
-		void* dy = ::dlopen(dllfile, RTLD_NOW);
+		void* dy = ::dlopen(path.c_str(), RTLD_NOW);
 #endif
 		return dy;
 	}
@@ -890,11 +896,11 @@ namespace xhnet
 
 	void* GetDyLibFun(void* dy, const std::string& funname)
 	{
-		if (0 == dy) return false;
+		if (0 == dy) return 0;
 #if defined _PLATFORM_WINDOWS_
 		void* pfun = ::GetProcAddress((HINSTANCE)(dy), funname.c_str());
 #elif defined _PLATFORM_LINUX_
-		void* pfun = ::dlsym(dy, funname);
+		void* pfun = ::dlsym(dy, funname.c_str());
 #endif
 		return pfun;
 	}

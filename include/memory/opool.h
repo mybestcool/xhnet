@@ -179,7 +179,7 @@ namespace xhnet
 			}
 		}
 
-		void GetStat(unsigned int& all, unsigned int& used, unsigned int &free)
+		void GetStat(unsigned long& all, unsigned long& used, unsigned long &free)
 		{
 			m_pool.GetMemStat(all, used, free);
 		}
@@ -214,7 +214,7 @@ namespace xhnet
 
 		static void* operator new(size_t alloclength)
 		{
-			assert(sizeof(T) == alloclength);
+			//assert(sizeof(T) == alloclength);
 			return m_pool.Allocate();
 		}
 
@@ -223,7 +223,7 @@ namespace xhnet
 			m_pool.Free((T*)(deletepointer));
 		}
 
-		static void GetStat(unsigned int& all, unsigned int& used, unsigned int &free)
+		static void GetStat(unsigned long& all, unsigned long& used, unsigned long &free)
 		{
 			m_pool.GetStat(all, used, free);
 		}

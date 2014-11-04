@@ -1,12 +1,14 @@
 
 #include <cassert>
 #include <memory>
+#include <stdlib.h>
+#include <assert.h>
 
 #include "memory/mpage.h"
 
 namespace xhnet
 {
-	CMPage::CMPage(unsigned int block_size, unsigned int align_size)
+	CMPage::CMPage(unsigned long block_size, unsigned long align_size)
 		: m_memory(0), m_freeblock_head(0), m_freeblock_num(0)
 		, m_allblock_num(0), m_page_size(0)
 		, m_align_size(0), m_block_size(0)
@@ -19,7 +21,7 @@ namespace xhnet
 		destory();
 	}
 
-	bool CMPage::Reset(unsigned int block_size, unsigned int align_size)
+	bool CMPage::Reset(unsigned long block_size, unsigned long align_size)
 	{
 		if (!Is_Intact())
 		{
@@ -70,7 +72,7 @@ namespace xhnet
 		}
 	}
 
-	unsigned int CMPage::Calc_AlignedSize(unsigned int block_size, unsigned int align_size)
+	unsigned long CMPage::Calc_AlignedSize(unsigned long block_size, unsigned long align_size)
 	{
 		// 内存块的大小要满足内存对齐的要求, 这样才能使CPU寻址最快.  
 		// __alignof(T)是为了检测T对齐的粒度, 因为用户可以指定对齐的粒度,  
@@ -85,8 +87,8 @@ namespace xhnet
 		// 这样就满足内存对齐的要求了, 很不错的算法  
 		//  
 		// 这里有一个问题, 如果sizeof(T)比一个指针要小, 那么会浪费内存  
-		unsigned int aligned_blocksize = block_size;
-		unsigned int diff = aligned_blocksize % align_size;
+		unsigned long aligned_blocksize = block_size;
+		unsigned long diff = aligned_blocksize % align_size;
 		if (diff != 0) aligned_blocksize += align_size - diff;
 
 		// 注意: 如果分配的blockSize比一个指针还小, 那么就至少要分配一个指针的大小  
@@ -95,12 +97,12 @@ namespace xhnet
 		return aligned_blocksize;
 	}
 
-	unsigned int CMPage::Calc_PageSize(unsigned int block_size, unsigned int align_size, unsigned int aligned_block_size)
+	unsigned long CMPage::Calc_PageSize(unsigned long block_size, unsigned long align_size, unsigned long aligned_block_size)
 	{
-		unsigned int pointersize = sizeof(FreeBlock*);
-		unsigned int moresize = aligned_block_size - block_size + pointersize;
+		unsigned long pointersize = sizeof(FreeBlock*);
+		unsigned long moresize = aligned_block_size - block_size + pointersize;
 
-		unsigned int pagesize = 0;
+		unsigned long pagesize = 0;
 		if (aligned_block_size + moresize > DEFAULT_PAGESIZE)
 		{
 			pagesize = aligned_block_size + moresize;
@@ -113,20 +115,20 @@ namespace xhnet
 		return pagesize;
 	}
 
-	unsigned int CMPage::Calc_PageSize(unsigned int block_size, unsigned int align_size)
+	unsigned long CMPage::Calc_PageSize(unsigned long block_size, unsigned long align_size)
 	{
 		return Calc_PageSize(block_size, align_size, Calc_AlignedSize(block_size, align_size));
 	}
 
-	void CMPage::create(unsigned int block_size, unsigned int align_size)
+	void CMPage::create(unsigned long block_size, unsigned long align_size)
 	{
 		// 得到对齐后的一个block的内存大小，每个block必须大于sizeof(FreeBlock*)
 		m_block_size = Calc_AlignedSize(block_size, align_size);
 
 		// 分配足够的内存, 这里的算法很经典, 早期的STL中使用的就是这个算法  
 		// 首先是维护FreeBlock指针占用的内存大小  
-		unsigned int pointersize = sizeof(FreeBlock*);
-		unsigned int moresize = m_block_size - block_size + pointersize;
+		unsigned long pointersize = sizeof(FreeBlock*);
+		unsigned long moresize = m_block_size - block_size + pointersize;
 
 		if (m_block_size + moresize > DEFAULT_PAGESIZE)
 		{
@@ -144,11 +146,11 @@ namespace xhnet
 		}
 
 		// 如果原来的跟现在的内存一样大小 就不再分配
-		unsigned int src_pagesize = Get_PageSize();
+		unsigned long src_pagesize = Get_PageSize();
 		void* src_raw = 0;
 		if (m_memory)
 		{
-			src_raw = *(void**)((unsigned int)m_memory - pointersize);
+			src_raw = *(void**)(cast2uint(m_memory) - pointersize);
 		}
 		void* raw = 0;
 		if (src_raw)
@@ -170,11 +172,11 @@ namespace xhnet
 		}
 
 		// 这里实Pool真正为对象实例分配的内存地址  
-		unsigned int start = (unsigned int)raw + moresize;
+		unsigned long start = cast2uint(raw) + moresize;
 		void* aligned = (void*)((start + m_align_size - 1)&(~(m_align_size - 1)));
 
 		// 这里维护一个指向malloc()真正分配的内存  
-		*(void**)((unsigned int)aligned - pointersize) = raw;
+		*(void**)(cast2uint(aligned) - pointersize) = raw;
 
 		m_memory = aligned;
 
@@ -189,7 +191,7 @@ namespace xhnet
 	void CMPage::destory(void)
 	{
 		// 释放操作很简单了, 参见上图  
-		void* raw = *(void**)((unsigned int)m_memory - sizeof(void*));
+		void* raw = *(void**)(cast2uint(m_memory) - sizeof(void*));
 		::free(raw);
 		m_memory = 0;
 	}
@@ -211,7 +213,7 @@ namespace xhnet
 			{
 				// If the block has not been previously allocated its next pointer  
 				// will be NULL so just update the list head to the next block in the pool   
-				m_freeblock_head = (FreeBlock*)(((unsigned int)m_freeblock_head) + m_block_size);
+				m_freeblock_head = (FreeBlock*)(cast2uint(m_freeblock_head) + m_block_size);
 				m_freeblock_head->next = NULL;
 			}
 			else

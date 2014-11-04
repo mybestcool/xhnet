@@ -18,7 +18,7 @@ namespace xhnet
 		~CMPool(void) { }
 
 		// 最好不要allocate 大于60k的内存
-		void* Allocate(unsigned int size, unsigned int align_size=CMPage::DEFAULT_ALIGNSIZE)
+		void* Allocate(unsigned long size, unsigned long align_size = CMPage::DEFAULT_ALIGNSIZE)
 		{
 			std::lock_guard<M> guard(m_mutex);
 			return m_pool.Allocate(size, align_size);
@@ -38,7 +38,7 @@ namespace xhnet
 			m_pool.Free(ptr);
 		}
 
-		void GetStat(unsigned int& all, unsigned int& used, unsigned int &free)
+		void GetStat(unsigned long& all, unsigned long& used, unsigned long &free)
 		{
 			m_pool.GetMemStat(all, used, free);
 		}

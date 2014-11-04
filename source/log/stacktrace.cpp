@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 
+#include <xhhead.h>
 #include "log/stacktrace.h"
 #include "xhlog.h"
 
@@ -34,7 +35,11 @@ namespace xhnet
 
 		while (indent-- > 0)
 		{
-			int n = _snprintf_s(p, remain, remain-1, "  ");
+#if defined _PLATFORM_WINDOWS_
+			int n = _snprintf_s(p, remain, remain - 1, "  ");
+#elif defined _PLATFORM_LINUX_
+			int n = snprintf(p, remain-1, "  ");
+#endif	
 			p += n;
 			remain -= n;
 		}

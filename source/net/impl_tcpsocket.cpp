@@ -17,7 +17,7 @@ namespace xhnet
 
 	static unsigned int gen_tcp_socketid()
 	{
-		static std::atomic<unsigned int> gen_socketid = 0;
+		static std::atomic<unsigned int> gen_socketid(0);
 		return ++gen_socketid;
 	}
 
@@ -254,7 +254,7 @@ namespace xhnet
 		m_status = status_connect;
 
 		socketaddr bindaddr;
-		int addrlen = sizeof(bindaddr);
+		ev_socklen_t addrlen = sizeof(bindaddr);
 		if (!ipport2sockaddr(m_localip, m_localport, &bindaddr, addrlen))
 		{
 			XH_LOG_ERROR(logname_base, "tcpsocket listen failed iperr, ip:" << ip << ", port:" << port);
@@ -324,7 +324,7 @@ namespace xhnet
 		m_status = status_connect;
 
 		socketaddr connectaddr;
-		int addrlen = sizeof(connectaddr);
+		ev_socklen_t addrlen = sizeof(connectaddr);
 		if (!ipport2sockaddr(m_peerip, m_peerport, &connectaddr, addrlen))
 		{
 			XH_LOG_ERROR(logname_base, "tcpsocket connect failed errip, ip:" << ip << ", port:" << port);
@@ -362,7 +362,7 @@ namespace xhnet
 		m_socket = connecter;
 
 		socketaddr localaddr;
-		int locallen = sizeof(localaddr);
+		ev_socklen_t locallen = sizeof(localaddr);
 		if (0 == getsockname(m_socket, (struct sockaddr*)&localaddr, &locallen))
 		{
 			sockaddr2ipport(&localaddr, locallen, m_localip, m_localport);
@@ -463,7 +463,7 @@ namespace xhnet
 	void CTcpSocket::on_inter_listen_accept(evutil_socket_t listenfd)
 	{
 		socketaddr acceptaddr;
-		int addrlen = sizeof(acceptaddr);
+		ev_socklen_t addrlen = sizeof(acceptaddr);
 
 		evutil_socket_t newfd = ::accept(listenfd, (struct sockaddr*)&acceptaddr, &addrlen);
 		if (newfd == INVALID_SOCKET)
@@ -491,7 +491,7 @@ namespace xhnet
 		}
 	}
 
-	void CTcpSocket::on_inter_accept_accept(evutil_socket_t fd, socketaddr* peeraddr, int addrlen)
+	void CTcpSocket::on_inter_accept_accept(evutil_socket_t fd, socketaddr* peeraddr, ev_socklen_t addrlen)
 	{
 		CScopeGuard releaseguard(
 			[&]{
@@ -517,7 +517,7 @@ namespace xhnet
 		}
 
 		socketaddr localaddr;
-		int locallen = sizeof(localaddr);
+		ev_socklen_t locallen = sizeof(localaddr);
 		if (0 == getsockname(m_socket, (struct sockaddr*)&localaddr, &locallen))
 		{
 			sockaddr2ipport(&localaddr, locallen, m_localip, m_localport);

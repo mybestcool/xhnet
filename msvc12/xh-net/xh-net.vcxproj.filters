@@ -195,7 +195,7 @@
     <ClInclude Include="..\..\source\exception\smart_assert.h">
       <Filter>source\exception</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\exception\StackWalker.h">
+    <ClInclude Include="..\..\source\exception\windows\StackWalker.h">
       <Filter>source\exception</Filter>
     </ClInclude>
   </ItemGroup>
@@ -242,10 +242,10 @@
     <ClCompile Include="..\..\source\exception\smart_assert.cpp">
       <Filter>source\exception</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\exception\StackWalker.cpp">
+    <ClCompile Include="..\..\source\exception\traceback.cpp">
       <Filter>source\exception</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\exception\traceback.cpp">
+    <ClCompile Include="..\..\source\exception\windows\StackWalker.cpp">
       <Filter>source\exception</Filter>
     </ClCompile>
   </ItemGroup>

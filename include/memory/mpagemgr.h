@@ -24,6 +24,9 @@ namespace xhnet
 	class CPageList
 	{
 	public:
+		typedef xh_page_list<CMPage*>			page_list;
+		typedef page_list::iterator				page_list_it;
+
 		CPageList();
 		~CPageList();
 
@@ -34,7 +37,7 @@ namespace xhnet
 		size_t Size() { return m_pages.size(); }
 
 	public:
-		xh_page_list<CMPage*> m_pages;
+		page_list m_pages;
 
 	public:
 		CPageList(const CPageList&) = delete;
@@ -44,6 +47,9 @@ namespace xhnet
 	class CPageSet
 	{
 	public:
+		typedef xh_page_set<CMPage*>			page_set;
+		typedef page_set::iterator				page_set_it;
+
 		CPageSet();
 		~CPageSet();
 
@@ -54,7 +60,7 @@ namespace xhnet
 		size_t Size() { return m_pages.size(); }
 
 	public:
-		xh_page_set<CMPage*> m_pages;
+		page_set m_pages;
 
 	public:
 		CPageSet(const CPageSet&) = delete;
@@ -65,6 +71,9 @@ namespace xhnet
 	class CPagesMap
 	{
 	public:
+		typedef xh_page_map<T, D*>				page_map;
+		typedef typename page_map::iterator		page_map_it;
+
 		CPagesMap()
 		{
 		}
@@ -79,7 +88,7 @@ namespace xhnet
 		}
 		D* Find(T key)
 		{
-			xh_page_map<T, D*>::iterator it = m_pages.find(key);
+			page_map_it it = m_pages.find(key);
 			if (it == m_pages.end())
 			{
 				return 0;
@@ -89,7 +98,7 @@ namespace xhnet
 		}
 		D* Pop(T key)
 		{
-			xh_page_map<T, D*>::iterator it = m_pages.find(key);
+			page_map_it it = m_pages.find(key);
 			if (it == m_pages.end())
 			{
 				return 0;
@@ -103,7 +112,7 @@ namespace xhnet
 		{
 			if (bdelete)
 			{
-				for (xh_page_map<T, D*>::iterator it = m_pages.begin(); it != m_pages.end(); ++it)
+				for (page_map_it it = m_pages.begin(); it != m_pages.end(); ++it)
 				{
 					if (it->second)
 					{
@@ -116,7 +125,7 @@ namespace xhnet
 		}
 
 	public:
-		xh_page_map<T, D*> m_pages;
+		page_map m_pages;
 
 	public:
 		CPagesMap(const CPagesMap&) = delete;
@@ -130,13 +139,13 @@ namespace xhnet
 		// 当空闲队列的长度大于DEFAULT_START_RECYCLE_SIZE，之后回收的内存全部返回给系统
 		enum { DEFAULT_START_RECYCLE_SIZE = 10 };
 
-		CSameSizeMPageMgr(unsigned int block_size, unsigned int align_size, unsigned int recycle_size = DEFAULT_START_RECYCLE_SIZE);
+		CSameSizeMPageMgr(unsigned long block_size, unsigned long align_size, unsigned long recycle_size = DEFAULT_START_RECYCLE_SIZE);
 		~CSameSizeMPageMgr(void);
 
 		void* Allocate(void);
 		void Free(void* ptr);
 
-		void GetMemStat(unsigned int& all, unsigned int& used, unsigned int &free);
+		void GetMemStat(unsigned long& all, unsigned long& used, unsigned long &free);
 
 		void Set_AllPages(CPageSet* pages)
 		{
@@ -153,20 +162,20 @@ namespace xhnet
 			m_using_map = usingmap;
 		}
 
-		unsigned int Get_Block_Size(void)
+		unsigned long Get_Block_Size(void)
 		{
 			return m_block_size;
 		}
 
-		unsigned int Get_Align_Size(void)
+		unsigned long Get_Align_Size(void)
 		{
 			return m_align_size;
 		}
 	private:
-		unsigned int		m_block_size;
-		unsigned int		m_align_size;
+		unsigned long		m_block_size;
+		unsigned long		m_align_size;
 		
-		unsigned int		m_recycle_size;
+		unsigned long		m_recycle_size;
 
 		// 所有的chunk
 		CPageSet*			m_all_pages;
@@ -188,24 +197,24 @@ namespace xhnet
 	class CMPageMgr
 	{
 	public:
-		CMPageMgr(unsigned int recycle_size = CSameSizeMPageMgr::DEFAULT_START_RECYCLE_SIZE);
+		CMPageMgr(unsigned long recycle_size = CSameSizeMPageMgr::DEFAULT_START_RECYCLE_SIZE);
 		~CMPageMgr(void);
 
-		void* Allocate(unsigned int block_size, unsigned int align_size);
+		void* Allocate(unsigned long block_size, unsigned long align_size);
 		void Free(void* ptr);
 
-		void GetMemStat(unsigned int& all, unsigned int& used, unsigned int &free);
+		void GetMemStat(unsigned long& all, unsigned long& used, unsigned long &free);
 
 	private:
-		unsigned int								m_recycle_size;
+		unsigned long								m_recycle_size;
 
 		CPageSet									m_all_pages;
 		
 		// pagesize -> pagelist
-		CPagesMap<unsigned int, CPageList>			m_free_pages;
+		CPagesMap<unsigned long, CPageList>			m_free_pages;
 
 		// alignedblocksize->mgr
-		CPagesMap<unsigned int, CSameSizeMPageMgr>	m_using_pages;
+		CPagesMap<unsigned long, CSameSizeMPageMgr>	m_using_pages;
 
 		//
 		CPagesMap<void*, CMPage>					m_using_map;

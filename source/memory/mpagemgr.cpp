@@ -34,7 +34,7 @@ namespace xhnet
 
 	CMPage* CPageList::Find(std::function<bool(CMPage*)> fun)
 	{
-		for (xh_page_list<CMPage*>::iterator it = m_pages.begin(); it != m_pages.end(); ++it)
+		for (page_list_it it = m_pages.begin(); it != m_pages.end(); ++it)
 		{
 			if (fun(*it))
 			{
@@ -49,7 +49,7 @@ namespace xhnet
 	{
 		if (bdelete)
 		{
-			for (xh_page_list<CMPage*>::iterator it = m_pages.begin(); it != m_pages.end(); ++it)
+			for (page_list_it it = m_pages.begin(); it != m_pages.end(); ++it)
 			{
 				if (*it)
 				{
@@ -86,7 +86,7 @@ namespace xhnet
 
 	CMPage* CPageSet::Find(std::function<bool(CMPage*)> fun)
 	{
-		for (xh_page_set<CMPage*>::iterator it = m_pages.begin(); it != m_pages.end(); ++it)
+		for (page_set_it it = m_pages.begin(); it != m_pages.end(); ++it)
 		{
 			if (fun(*it))
 			{
@@ -101,7 +101,7 @@ namespace xhnet
 	{
 		if (bdelete)
 		{
-			for (xh_page_set<CMPage*>::iterator it = m_pages.begin(); it != m_pages.end(); ++it)
+			for (page_set_it it = m_pages.begin(); it != m_pages.end(); ++it)
 			{
 				if (*it)
 				{
@@ -115,7 +115,7 @@ namespace xhnet
 
 
 
-	CSameSizeMPageMgr::CSameSizeMPageMgr(unsigned int block_size, unsigned int align_size, unsigned int recycle_size)
+	CSameSizeMPageMgr::CSameSizeMPageMgr(unsigned long block_size, unsigned long align_size, unsigned long recycle_size)
 	{
 		m_block_size	= CMPage::Calc_AlignedSize(block_size, align_size);
 		m_align_size	= align_size;
@@ -151,7 +151,15 @@ namespace xhnet
 
 		if (!m_cur_allocpage)
 		{
-			m_cur_allocpage = m_using_pages.Find([](CMPage* page){  if (!page) return false; return !page->Is_Empty(); });
+			m_cur_allocpage = m_using_pages.Find(
+				std::bind(
+					[](CMPage* page)
+					{  
+						if (!page) return false; 
+						return !page->Is_Empty(); 
+					}
+					, std::placeholders::_1 )
+				);
 
 			if (!m_cur_allocpage)
 			{
@@ -230,14 +238,14 @@ namespace xhnet
 		}
 	}
 
-	void CSameSizeMPageMgr::GetMemStat(unsigned int& all, unsigned int& used, unsigned int &free)
+	void CSameSizeMPageMgr::GetMemStat(unsigned long& all, unsigned long& used, unsigned long &free)
 	{
 		if (!m_all_pages) return;
 
-		unsigned int myall = 0;
-		unsigned int myused = 0;
-		unsigned int myfree = 0;
-		for (xh_page_set<CMPage*>::iterator it = m_all_pages->m_pages.begin(); it != m_all_pages->m_pages.end(); ++it)
+		unsigned long myall = 0;
+		unsigned long myused = 0;
+		unsigned long myfree = 0;
+		for (CPageSet::page_set_it it = m_all_pages->m_pages.begin(); it != m_all_pages->m_pages.end(); ++it)
 		{
 			CMPage* page = *it;
 			if (page)
@@ -255,7 +263,7 @@ namespace xhnet
 
 
 
-	CMPageMgr::CMPageMgr(unsigned int recycle_size)
+	CMPageMgr::CMPageMgr(unsigned long recycle_size)
 		:m_recycle_size( recycle_size )
 	{
 
@@ -271,14 +279,14 @@ namespace xhnet
 		m_using_map.Clear(false);
 	}
 
-	void* CMPageMgr::Allocate(unsigned int block_size, unsigned int align_size)
+	void* CMPageMgr::Allocate(unsigned long block_size, unsigned long align_size)
 	{
-		unsigned int aligned_block_size = CMPage::Calc_AlignedSize(block_size, align_size);
+		unsigned long aligned_block_size = CMPage::Calc_AlignedSize(block_size, align_size);
 
 		CSameSizeMPageMgr* mgr = m_using_pages.Find(aligned_block_size);
 		if (!mgr)
 		{
-			unsigned int page_size = CMPage::Calc_PageSize(block_size, align_size, aligned_block_size);
+			unsigned long page_size = CMPage::Calc_PageSize(block_size, align_size, aligned_block_size);
 
 			CPageList* freepages = m_free_pages.Find(page_size);
 			if ( !freepages )
@@ -327,12 +335,12 @@ namespace xhnet
 		}
 	}
 
-	void CMPageMgr::GetMemStat(unsigned int& all, unsigned int& used, unsigned int &free)
+	void CMPageMgr::GetMemStat(unsigned long& all, unsigned long& used, unsigned long &free)
 	{
-		unsigned int myall = 0;
-		unsigned int myused = 0;
-		unsigned int myfree = 0;
-		for (xh_page_set<CMPage*>::iterator it = m_all_pages.m_pages.begin(); it != m_all_pages.m_pages.end(); ++it)
+		unsigned long myall = 0;
+		unsigned long myused = 0;
+		unsigned long myfree = 0;
+		for (CPageSet::page_set_it it = m_all_pages.m_pages.begin(); it != m_all_pages.m_pages.end(); ++it)
 		{
 			CMPage* page = *it;
 			if ( page )

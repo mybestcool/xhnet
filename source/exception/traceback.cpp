@@ -12,7 +12,7 @@
 
 #if defined _PLATFORM_WINDOWS_
 
-#include "StackWalker.h"
+#include "windows/StackWalker.h"
 #include <eh.h>
 #include <tchar.h>
 #include <time.h>
@@ -231,6 +231,7 @@ namespace xhnet
 #include <stdlib.h>
 #include <cxxabi.h>
 #include <signal.h>
+#include <string.h>
 
 namespace xhnet
 {
@@ -321,7 +322,7 @@ namespace xhnet
 
 		if ( strlen(tempbuff)>0 )
 		{
-			XH_LOG_TRACE(xhnet::logname_trace, szText);
+			XH_LOG_TRACE(xhnet::logname_trace, tempbuff);
 		}
 	}
 

@@ -127,7 +127,7 @@
     <ClInclude Include="..\..\include\xhutility.h" />
     <ClInclude Include="..\..\source\exception\ensure.h" />
     <ClInclude Include="..\..\source\exception\smart_assert.h" />
-    <ClInclude Include="..\..\source\exception\StackWalker.h" />
+    <ClInclude Include="..\..\source\exception\windows\StackWalker.h" />
     <ClInclude Include="..\..\source\net\impl_ioserver.h" />
     <ClInclude Include="..\..\source\net\impl_nethead.h" />
     <ClInclude Include="..\..\source\net\impl_tcpsocket.h" />
@@ -137,8 +137,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\exception\ensure.cpp" />
     <ClCompile Include="..\..\source\exception\smart_assert.cpp" />
-    <ClCompile Include="..\..\source\exception\StackWalker.cpp" />
     <ClCompile Include="..\..\source\exception\traceback.cpp" />
+    <ClCompile Include="..\..\source\exception\windows\StackWalker.cpp" />
     <ClCompile Include="..\..\source\log\actionstat.cpp" />
     <ClCompile Include="..\..\source\log\filelog.cpp" />
     <ClCompile Include="..\..\source\log\stacktrace.cpp" />

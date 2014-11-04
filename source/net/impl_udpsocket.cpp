@@ -14,7 +14,7 @@ namespace xhnet
 
 	static unsigned int gen_udp_socketid()
 	{
-		static std::atomic<unsigned int> gen_socketid = 0;
+		static std::atomic<unsigned int> gen_socketid( 0 );
 		return ++gen_socketid;
 	}
 
@@ -146,7 +146,7 @@ namespace xhnet
 		m_status = status_connect;
 
 		socketaddr bindaddr;
-		int addrlen = sizeof(bindaddr);
+		ev_socklen_t addrlen = sizeof(bindaddr);
 		if (!ipport2sockaddr(m_localip, m_localport, &bindaddr, addrlen))
 		{
 			m_status = status_init;
@@ -250,7 +250,7 @@ namespace xhnet
 		CIOBuffer* recvbuff = buff.buff;
 
 		socketaddr addr;
-		int addrlen = sizeof(addr);
+		ev_socklen_t addrlen = sizeof(addr);
 
 		std::string fromip;
 		unsigned int fromport;
@@ -294,7 +294,7 @@ namespace xhnet
 			int errid = udp_ok;
 
 			socketaddr sendaddr;
-			int addrlen = sizeof(sendaddr);
+			ev_socklen_t addrlen = sizeof(sendaddr);
 			if (!ipport2sockaddr(m_localip, m_localport, &sendaddr, addrlen))
 			{
 				errid = udp_sendfail_iperr;
@@ -313,7 +313,7 @@ namespace xhnet
 				}
 			}
 
-			m_cb->On_Recv(GetSocketID(), udp_sendfail_iperr, buff.ip, buff.port, sendbuff);
+			m_cb->On_Recv(GetSocketID(), errid, buff.ip, buff.port, sendbuff);
 			
 			m_wait_send.pop();
 			sendbuff->Release();

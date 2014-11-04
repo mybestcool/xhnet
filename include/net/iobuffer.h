@@ -2,6 +2,7 @@
 #pragma once
 
 #include <string>
+#include <string.h>
 #include <vector>
 #include <set>
 #include <map>
@@ -191,7 +192,7 @@ namespace xhnet
 
 		CIOBuffer& Write_CareED(const char* p, unsigned int len)
 		{
-			if (XH_IS_BIGENDIAN()==m_biged)
+			if (XH_SYSTEM_BIGENDIAN() == m_biged)
 			{
 				return write_order(p, len);
 			}
@@ -336,7 +337,7 @@ namespace xhnet
 
 		CIOBuffer& Read_CareED(char* p, size_t len)
 		{
-			if (XH_IS_BIGENDIAN() == m_biged)
+			if (XH_SYSTEM_BIGENDIAN() == m_biged)
 			{
 				return read_order(p, len);
 			}
