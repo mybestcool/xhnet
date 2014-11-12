@@ -30,7 +30,7 @@ int main( int argc, char** argv )
 	// ip v4 test
 	{
 		xhnet::socketaddr addr;
-		int addrlen = 0;
+		ev_socklen_t addrlen = 0;
 		bool bret = xhnet::ipport2sockaddr("127.0.0.1", 5555, &addr, addrlen);
 
 		std::string ip;
@@ -41,7 +41,7 @@ int main( int argc, char** argv )
 	// ip v6 test
 	{
 		xhnet::socketaddr addr;
-		int addrlen = 0;
+		ev_socklen_t addrlen = 0;
 		bool bret = xhnet::ipport2sockaddr("[fe80::4c00:bbad:a546:fbf6]", 5555, &addr, addrlen);
 
 		std::string ip;

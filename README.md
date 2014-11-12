@@ -9,7 +9,7 @@ xhnet
 ###2、需要libevent、libiconv、log4cplus等第三方库###
 ###3、windows下vs2013编译通过###
 ###4、centos编译通过###
-###4、使用了c++11特性###
+###5、使用了c++11特性###
  
 
 

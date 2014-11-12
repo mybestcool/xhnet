@@ -1,6 +1,6 @@
 #libevent pkg-config source file
 
-prefix=/home/_projects/xhnet/dependencies/linux/libevent
+prefix=/mnt/share/xh-net/dependencies/linux/libevent
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

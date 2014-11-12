@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/_projects/xhnet/dependencies/linux/libevent/lib'
+libdir='/mnt/share/xh-net/dependencies/linux/libevent/lib'

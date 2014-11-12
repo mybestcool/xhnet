@@ -28,7 +28,7 @@
 #endif
 
 
-class StackWalkerToConsole : public StackWalker
+class StackWalkerToLog : public StackWalker
 {
 protected:
   // do not print modules initialization
@@ -45,7 +45,7 @@ namespace xhnet
 {
 	void print_traceback()
 	{
-		StackWalkerToConsole sw; sw.ShowCallstack();
+		StackWalkerToLog sw; sw.ShowCallstack();
 	}
 
 	class CCPlusPlusException
@@ -53,12 +53,11 @@ namespace xhnet
 	public:
 		CCPlusPlusException(unsigned int errid, EXCEPTION_POINTERS* pExp)
 		{
-			XH_LOG_TRACE(xhnet::logname_trace, "################################################################################");
-			XH_LOG_TRACE(xhnet::logname_trace, "catch err:" << errid);
-			StackWalkerToConsole sw;
+			XH_LOG_TRACE(xhnet::logname_trace, "#####--beg stack err:"<<errid<<"--#####");
+			StackWalkerToLog sw;
 			sw.ShowCallstack(GetCurrentThread(), pExp->ContextRecord);
 			//print_traceback();
-			XH_LOG_TRACE(xhnet::logname_trace, "################################################################################");
+			XH_LOG_TRACE(xhnet::logname_trace, "#####--end stack err:"<<errid<<"--#####");
 		}
 
 		~CCPlusPlusException(void)
@@ -233,6 +232,9 @@ namespace xhnet
 #include <signal.h>
 #include <string.h>
 
+//#include <cxxabi.h>
+//#include <libunwind.h>
+
 namespace xhnet
 {
 	void print_traceback()
@@ -326,16 +328,60 @@ namespace xhnet
 		}
 	}
 
-	class CCPlusPlusException
+	//void print_traceback2()
+	//{
+	//	unw_cursor_t cursor;
+	//	unw_context_t context;
+
+	//	unw_getcontext(&context);
+	//	unw_init_local(&cursor, &context);
+
+	//	// buffer
+	//	char tempbuff[10240] = { 0 };
+	//	unsigned int usedbuff = 0;
+
+	//	while (unw_step(&cursor) > 0) {
+	//		unw_word_t offset, pc;
+	//		char fname[200];
+	//		size_t demangledSize = 200;
+	//		char* demangled = (char*) malloc(demangledSize);
+
+	//		unw_get_reg(&cursor, UNW_REG_IP, &pc);
+	//		fname[0] = '\0';
+	//		unw_get_proc_name(&cursor, fname, sizeof(fname), &offset);
+
+	//		int status;
+
+	//		char *ret = abi::__cxa_demangle(fname, demangled, &demangledSize, &status);
+	//		if (ret) {
+	//			// return value may be a realloc() of the input
+	//			demangled = ret;
+	//		}
+	//		else {
+	//			// demangling failed, just pretend it's a C demangled with no args
+	//			strncpy(demangled, fname, demangledSize);
+	//			strncat(demangled, "()", demangledSize);
+	//			demangled[demangledSize-1] = '\0';
+	//		}
+
+	//		usedbuff = strlen(tempbuff);
+	//		snprintf(tempbuff+usedbuff, sizeof(tempbuff)-1-usedbuff, "%s+0x%lx [%lx]\n", demangled, offset, pc );
+
+	//		free(demangled);
+	//	}
+	//	
+	//	XH_LOG_TRACE(xhnet::logname_trace, tempbuff);
+	//}
+
+	class CCPlusPlusException : public std::exception
 	{
 	public:
-		CCPlusPlusException(unsigned int errid)
+		CCPlusPlusException( int sig )
 		{
-			XH_LOG_TRACE(xhnet::logname_trace, "################################################################################");
-			XH_LOG_TRACE(xhnet::logname_trace, "catch err:" << errid);
-			// 可能存在问题
+			XH_LOG_TRACE(xhnet::logname_trace, "#####--beg stack err:"<<sig<<"--#####");
+			// 需要加-rdynamic才会打印出函数，不然用gdb list *地址 来得到异常的地方
 			xhnet::print_traceback();
-			XH_LOG_TRACE(xhnet::logname_trace, "################################################################################");
+			XH_LOG_TRACE(xhnet::logname_trace, "#####--end stack err:"<<sig<<"--#####");
 		}
 
 		~CCPlusPlusException(void)
@@ -344,9 +390,9 @@ namespace xhnet
 		}
 	};
 
-	void abort_handler( int signum )
+	void abort_handler( int sig )
 	{
-		throw CCPlusPlusException(signum);
+		throw CCPlusPlusException( sig ); 
 	}
 
 	void open_exception_translator()
@@ -355,16 +401,22 @@ namespace xhnet
 		if ( !binit )
 		{
 			binit = true;
-			signal( SIGABRT, abort_handler );
+
+			signal( SIGINT, abort_handler );
+			signal( SIGQUIT, abort_handler );
+
+			signal( SIGBUS,  abort_handler );
 			signal( SIGSEGV, abort_handler );
-			signal( SIGILL,  abort_handler );
+			
 			signal( SIGFPE,  abort_handler );
+
 			signal( SIGPIPE,  NULL );
 		}
 	}
 
-	void open_dump(const char* dumpfile)
+	void open_dump()
 	{
+		XH_LOG_TRACE(xhnet::logname_trace, "make sure use shell cmd befor exe start:ulimit -c 1024000");
 	}
 };
 

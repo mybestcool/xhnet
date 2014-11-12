@@ -200,9 +200,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\test\test.cpp">
-      <Filter>test</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\utility\utility.cpp">
       <Filter>source\utility</Filter>
     </ClCompile>
@@ -247,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\exception\windows\StackWalker.cpp">
       <Filter>source\exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\test.cpp">
+      <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

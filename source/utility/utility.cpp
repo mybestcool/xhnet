@@ -731,7 +731,7 @@ namespace xhnet
 		tm tml = Time2TM(dayl);
 		tm tmr = Time2TM(dayr);
 
-		return tml.tm_yday == tml.tm_yday;
+		return tml.tm_yday == tmr.tm_yday;
 	}
 
 	// dayl>dayr

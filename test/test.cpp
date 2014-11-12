@@ -333,7 +333,7 @@ public:
 		// 连接失败 重连
 		if (GenRandUINT(0, 10) != 0)
 		{
-			if (m_socket->Connect("10.225.10.38", 5555))
+			if (m_socket->Connect("127.0.0.1", 5555))
 			{
 				return;
 			}
@@ -376,7 +376,7 @@ void connect_thread(void)
 			connectors[connect->GetSocketID()] = cb;
 		}
 
-		connect->Connect("10.225.10.38", 5555);
+		connect->Connect("127.0.0.1", 5555);
 	}
 }
 

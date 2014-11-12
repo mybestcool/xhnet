@@ -2,34 +2,16 @@
 #include "../include/stdhead.h"
 #include "../include/xhguard.h"
 
-#include "../3_libiconv-win32/include/iconv.h"
-#pragma comment( lib, "../3_libiconv-win32/lib/iconv.lib" )
-
 #include "memory/mpool.h"
 #include "memory/opool.h"
 #include "thread/nullmutex.h"
 
 #include "utility/utility.h"
 
-#include <direct.h>
-#include <io.h>
+#include <string.h>
 #include <stdlib.h>
 #include <random>
 
-bool conv_string(const string& from, const string to, char* in, unsigned int inlen, char* out, unsigned int outlen)
-{
-	iconv_t h = iconv_open(to.c_str(), from.c_str());
-	if (iconv_t(-1) == h) return false;
-
-	XH_GUARD([&]{ iconv_close(h); });
-
-	if (size_t(-1) == iconv(h, (const char **)&in, &inlen, &out, &outlen))
-	{
-		return false;
-	}
-
-	return true;
-}
 
 struct Test0
 {
@@ -50,29 +32,8 @@ struct Test2 : public xhnet::CInheritOPool<Test2, std::mutex>
 	unsigned long long c;
 };
 
-std::string upletter(std::string& str)
-{
-	std::for_each(str.begin(), str.end(), [](char& c){c = toupper((unsigned char)c); });
-	return str;
-}
-
-std::string lowletter(std::string& str)
-{
-	std::for_each(str.begin(), str.end(), [](char& c){c = tolower((unsigned char)c); });
-	return str;
-}
-
 int main( int argc, char** argv )
 {
-	/*char gbk_1[] = "ÆÆÏþµÄ²©¿Í";
-	char utf8_1[100] = { 0 };
-	char gbk_2[100] = { 0 };
-
-	size_t len0 = conv_string("GBK", "UTF-8", gbk_1, strlen(gbk_1), utf8_1, sizeof(utf8_1));
-	size_t len1 = conv_string("utf-8", "gbk", utf8_1, strlen(utf8_1), gbk_2, sizeof(gbk_2));
-
-	getchar();
-
 	xhnet::COPool<Test0, std::mutex> mpool0;
 	xhnet::COPool<Test1, std::mutex> mpool1;
 
@@ -138,14 +99,19 @@ int main( int argc, char** argv )
 	for (auto i : v2)
 	{
 		delete (i);
-	}*/
+	}
 
-	int ret = _access("test", 0);
+	xhnet::CreateDirectory("testdir");
+	string curpath = xhnet::GetModulePath();
+	if ( xhnet::IsSamePath(".", curpath))
+	{
+		std::cout<<"same path"<<std::endl;
+	}
+	else
+	{
+		std::cout<<"not same path"<<std::endl;
+	}
 
-	int ret2 = _mkdir("test");
-
-	char fullpath[_MAX_PATH];
-	_fullpath(fullpath, "test", _MAX_PATH);
 
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -159,8 +125,8 @@ int main( int argc, char** argv )
 
 	char testm[] = "0123456789";
 	string md5 = xhnet::GenMd5((unsigned char*)testm, strlen(testm));
-	lowletter(md5);
-	upletter(md5);
+	xhnet::LowLetters(md5);
+	xhnet::UpLetters(md5);
 
 	{
 		time_t nowtime = xhnet::Get_0H0M0S(xhnet::GetNowTM());

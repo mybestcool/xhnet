@@ -36,9 +36,9 @@ namespace xhnet
 	::xhnet::CFileLogger::GetInstance().AddLogger( ::xhnet::CLogger<logname>::GetInstance().m_logger, logpath, loglevel ); \
 	} while( 0 )
 
-#define XH_ADD_SAMEFILE_LOGGER(subid, mainid, loglevel) \
+#define XH_ADD_SAMEFILE_LOGGER(subname, mainname, loglevel) \
 	do { \
-	::xhnet::CFileLogger::GetInstance().AddSameFileLogger( ::xhnet::CLogger<subid>::GetInstance().m_logger, ::xhnet::CLogger<mainid>::GetInstance().m_logger, loglevel ); \
+	::xhnet::CFileLogger::GetInstance().AddSameFileLogger( ::xhnet::CLogger<subname>::GetInstance().m_logger, ::xhnet::CLogger<mainname>::GetInstance().m_logger, loglevel ); \
 	} while( 0 )
 
 // 修改日志等级
