@@ -18,26 +18,34 @@ namespace xhnet
 			: m_pool(sizeof(T), __alignof(T))
 		{
 			m_pool.Set_AllPages(&m_all_pages);
-			m_pool.Set_FreePages(&m_free_pages);
-			m_pool.Set_UsingMap(&m_using_pages);
 		}
 		~COPool(void) 
 		{
-			m_using_pages.Clear(false);
-			m_free_pages.Clear(false);
+			m_using_map.Clear(false);
 			m_all_pages.Clear(true);
 		}
 
 		T* Allocate(void)
 		{
 			std::lock_guard<M> guard(m_mutex);
-			return static_cast<T*>(m_pool.Allocate());
+			CMPage* allocfrompage = 0;
+			void* allocated = m_pool.AllocateFromPage(allocfrompage);
+			m_using_map.Push(allocated, allocfrompage);
+
+			return static_cast<T*>(allocated);
 		}
 
 		void Free(T* ptr)
 		{
 			std::lock_guard<M> guard(m_mutex);
-			m_pool.Free(ptr);
+
+			CMPage* page = m_using_map.Pop(ptr);
+			if (!page)
+			{
+				return;
+			}
+
+			m_pool.FreeToPage(ptr, page);
 		}
 
 
@@ -170,12 +178,72 @@ namespace xhnet
 			return 0;
 		}
 
+		template<class P0, class P1, class P2, class P3, class P4, class P5, class P6>
+		T* New_Object(const P0& p0, const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6)
+		{
+			void* object = Allocate();
+
+			if (object)	return (T*)(::new(object)T(p0, p1, p2, p3, p4, p5, p6));
+
+			return 0;
+		}
+
+		template<class P0, class P1, class P2, class P3, class P4, class P5, class P6>
+		T* New_Object(P0& p0, P1& p1, P2& p2, P3& p3, P4& p4, P5& p5, P6& p6)
+		{
+			void* object = Allocate();
+
+			if (object)	return (T*)(::new(object)T(p0, p1, p2, p3, p4, p5, p6));
+
+			return 0;
+		}
+
+		template<class P0, class P1, class P2, class P3, class P4, class P5, class P6, class P7>
+		T* New_Object(const P0& p0, const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6, const P7& p7)
+		{
+			void* object = Allocate();
+
+			if (object)	return (T*)(::new(object)T(p0, p1, p2, p3, p4, p5, p6, p7));
+
+			return 0;
+		}
+
+		template<class P0, class P1, class P2, class P3, class P4, class P5, class P6, class P7>
+		T* New_Object(P0& p0, P1& p1, P2& p2, P3& p3, P4& p4, P5& p5, P6& p6, P7& p7)
+		{
+			void* object = Allocate();
+
+			if (object)	return (T*)(::new(object)T(p0, p1, p2, p3, p4, p5, p6, p7));
+
+			return 0;
+		}
+
+		template<class P0, class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
+		T* New_Object(const P0& p0, const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6, const P7& p7, const P8& p8)
+		{
+			void* object = Allocate();
+
+			if (object)	return (T*)(::new(object)T(p0, p1, p2, p3, p4, p5, p6, p7, p8));
+
+			return 0;
+		}
+
+		template<class P0, class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
+		T* New_Object(P0& p0, P1& p1, P2& p2, P3& p3, P4& p4, P5& p5, P6& p6, P7& p7, P8& p8)
+		{
+			void* object = Allocate();
+
+			if (object)	return (T*)(::new(object)T(p0, p1, p2, p3, p4, p5, p6, p7, p8));
+
+			return 0;
+		}
+
 		void Delete_Object(T* object)
 		{
 			if (object)
 			{
 				(object)->~T();
-				Free_To_Pool(object);
+				Free(object);
 			}
 		}
 
@@ -186,8 +254,7 @@ namespace xhnet
 
 	private:
 		CPageSet			m_all_pages;
-		CPageList			m_free_pages;
-		CPagesMap<void*, CMPage> m_using_pages;
+		CPagesMap<void*>	m_using_map;
 
 		CSameSizeMPageMgr	m_pool;
 

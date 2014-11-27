@@ -8,7 +8,7 @@ namespace xhnet
 	//                   这里满足内存对齐要求  
 	//                             |  
 	// ----------------------------------------------------------------------  
-	// | 内存对齐填充 | 维护的指针 | 对象1 | 对象2 | 对象3 | ...... | 对象n |  
+	// | 内存对齐填充 | 对象1 | 对象2 | 对象3 | ...... | 对象n |  
 	// ----------------------------------------------------------------------  
 	// ^                     | 指向malloc()分配的地址起点  
 	// |                     |  
@@ -86,7 +86,6 @@ namespace xhnet
 		}
 
 		static unsigned long Calc_AlignedSize(unsigned long block_size, unsigned long align_size);
-		static unsigned long Calc_PageSize(unsigned long block_size, unsigned long align_size, unsigned long aligned_block_size);
 		static unsigned long Calc_PageSize(unsigned long block_size, unsigned long align_size);
 
 	private:
@@ -96,7 +95,12 @@ namespace xhnet
 		FreeBlock* allocateblock();
 		void freeblock(FreeBlock* block);
 
-		bool isaligned(void* data, long alignment)
+		void* getaligned(void* data, unsigned long alignment)
+		{
+			return (void*)((cast2uint(data) + alignment - 1)&(~(alignment - 1)));
+		}
+
+		bool isaligned(void* data, unsigned long alignment)
 		{
 			// 又是一个经典算法, 参见<Hacker's Delight>  
 			return (cast2uint(data) & (unsigned long)(alignment - 1)) == 0;
@@ -104,7 +108,8 @@ namespace xhnet
 
 	public:
 		// 内存管理
-		void*				m_memory;			// A pointer to the memory allocated for the entire pool                
+		void*				m_memory;			// A pointer to the memory allocated for the entire pool
+		void*				m_block;			// A pointer to the block allocated for the entire pool                
 		FreeBlock*			m_freeblock_head;	// A pointer to the head of the linked list of free blocks  
 		unsigned long		m_freeblock_num;	// The current number of free blocks in the pool  
 

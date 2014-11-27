@@ -1,7 +1,13 @@
 
 #pragma once
 
+#include "xhhead.h"
+
+#ifdef _PLATFORM_WINDOWS_
+// windows下 1.1.1 版本不能用静态库。。。
 #define LOG4CPLUS_BUILD_DLL
+#endif // _DEBUG
+
 #include <log4cplus/include/log4cplus/logger.h>
 #include <log4cplus/include/log4cplus/loggingmacros.h>
 #include <log4cplus/include/log4cplus/appender.h>

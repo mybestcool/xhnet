@@ -7,7 +7,7 @@ namespace xhnet
 {
 	class CIOServer;
 
-	class CTimer : public ITimer, public CInheritOPool<CTimer, std::mutex>
+	class CTimer : public ITimer
 	{
 	public:
 		enum status
@@ -51,6 +51,9 @@ namespace xhnet
 	private:
 		CTimer(const CTimer&) = delete;
 		CTimer& operator=(const CTimer&) = delete;
+
+	public:
+		static COPool<CTimer, std::mutex> m_pool;
 	};
 
 };

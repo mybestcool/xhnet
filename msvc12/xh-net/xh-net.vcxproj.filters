@@ -21,9 +21,6 @@
     <Filter Include="source\memory">
       <UniqueIdentifier>{2bc43cc8-7170-4247-8f03-789628b96128}</UniqueIdentifier>
     </Filter>
-    <Filter Include="test">
-      <UniqueIdentifier>{de6b4851-349e-4659-a5e1-d87b909381b9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\md5">
       <UniqueIdentifier>{80905cdd-8c95-4b69-a8f7-ced0c47c7894}</UniqueIdentifier>
     </Filter>
@@ -192,11 +189,11 @@
     <ClInclude Include="..\..\source\exception\ensure.h">
       <Filter>source\exception</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\exception\smart_assert.h">
-      <Filter>source\exception</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\exception\windows\StackWalker.h">
       <Filter>source\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\exception\smart_assert.h">
+      <Filter>include\exception</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -244,9 +241,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\exception\windows\StackWalker.cpp">
       <Filter>source\exception</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\test\test.cpp">
-      <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

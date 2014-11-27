@@ -1,12 +1,14 @@
 
-#include "../include/stdhead.h"
-#include "../include/xhguard.h"
+#include "stdhead.h"
+#include "xh.h"
 
-#include "memory/mpool.h"
-#include "memory/opool.h"
-#include "thread/nullmutex.h"
-
-#include "utility/utility.h"
+#ifdef _PLATFORM_WINDOWS_
+#ifdef _DEBUG
+#pragma comment( lib, "../bins/Debug/xh-net.lib" )
+#else
+#pragma comment( lib, "../bins/Release/xh-net.lib" )
+#endif
+#endif
 
 #include <string.h>
 #include <stdlib.h>
@@ -101,9 +103,10 @@ int main( int argc, char** argv )
 		delete (i);
 	}
 
-	xhnet::CreateDirectory("testdir");
-	string curpath = xhnet::GetModulePath();
-	if ( xhnet::IsSamePath(".", curpath))
+	const string testdir = "testdir";
+	xhnet::MakeDir(testdir);
+	string curpath = xhnet::GetModuleDir();
+	if ( xhnet::IsSameDir(".", curpath))
 	{
 		std::cout<<"same path"<<std::endl;
 	}

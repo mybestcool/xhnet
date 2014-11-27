@@ -3,8 +3,8 @@
 
 #include "impl_ioserver.h"
 
-#include <xhguard.h>
-#include <xhlog.h>
+#include "xhguard.h"
+#include "xhlog.h"
 
 namespace xhnet
 {
@@ -12,7 +12,20 @@ namespace xhnet
 
 	ITcpSocket* ITcpSocket::Create(void)
 	{
-		return new CTcpSocket();
+		return CTcpSocket::Create();
+	}
+
+	COPool<CTcpSocket, std::mutex> CTcpSocket::m_pool;
+
+	CTcpSocket* CTcpSocket::Create(void)
+	{
+		CTcpSocket* socket = CTcpSocket::m_pool.New_Object();
+		if (socket)
+		{
+			socket->Set_DestoryCB([](CPPRef* ref){ CTcpSocket::m_pool.Delete_Object(dynamic_cast<CTcpSocket*>(ref)); });
+		}
+
+		return socket;
 	}
 
 	static unsigned int gen_tcp_socketid()
@@ -387,7 +400,7 @@ namespace xhnet
 	{
 		XH_GUARD([&]{Release(); });
 
-		if (!m_binit) 
+		if (!m_binit)
 			return;
 
 		//XH_GUARD([&]{
@@ -423,9 +436,9 @@ namespace xhnet
 		//});
 		
 		m_binit = false;
-
 		on_inter_close(tcp_close_bylocal, false);
-		XH_LOG_ERROR(logname_base, "tcpsocket fini");
+
+		XH_LOG_INFO(logname_base, "tcpsocket fini");
 
 		{
 			switch (m_type)
@@ -455,7 +468,6 @@ namespace xhnet
 				break;
 			}
 
-			m_status = status_null;
 			m_type = type_null;
 		}
 	}
@@ -472,38 +484,37 @@ namespace xhnet
 			return;
 		}
 
-		ITcpSocket* newsocket = ITcpSocket::Create();
+		CTcpSocket* newsocket = CTcpSocket::Create();
 		if (!newsocket)
 		{
 			closetcpsocket(newfd);
 			return;
 		}
 
+		XH_GUARD([&]{newsocket->Release(); });
 		m_lcb->On_Accept(GetSocketID(), newsocket);
 
-		CTcpSocket* tcpsocket = (CTcpSocket*)newsocket;
-		if (tcpsocket)
-			tcpsocket->on_inter_accept_accept(newfd, &acceptaddr, addrlen);
+		if (newsocket->m_io && newsocket->m_type == type_accepter)
+		{
+			std::string peerip;
+			unsigned int peerport = 0;
+
+			sockaddr2ipport(&acceptaddr, addrlen, m_peerip, m_peerport);
+
+			newsocket->Retain();
+			newsocket->m_io->Post(std::bind(&CTcpSocket::on_inter_accept_accept, newsocket, newfd, peerip, peerport));
+		}
 		else
 		{
-			XH_SAFE_RELEASE(newsocket);
-			XH_LOG_ERROR(logname_base, "tcpsocket listener cast<ITcpSocket->CTcpSocket> failed, ip:" << m_localip << ", port:" << m_localport);
+			closetcpsocket(newfd);
+			XH_LOG_ERROR(logname_base, "tcpsocket listener ITcpSocketCB::On_Accept failed or not be accepted by user, ip:" << m_localip << ", port:" << m_localport);
 		}
 	}
 
-	void CTcpSocket::on_inter_accept_accept(evutil_socket_t fd, socketaddr* peeraddr, ev_socklen_t addrlen)
+	void CTcpSocket::on_inter_accept_accept(evutil_socket_t fd, std::string peerip, unsigned int peerport)
 	{
-		CScopeGuard releaseguard(
-			[&]{
-			XH_LOG_ERROR(logname_base, "tcpsocket accept failed because of ICBTcpListener::On_Accept, user has not ITcpSocket::Init_Accepter");
-			Release();
-		});
+		XH_GUARD([&]{Release(); });
 
-		if (m_status != status_null) return;
-		if (!m_binit) return;
-		if (m_type != type_accepter) return;
-
-		releaseguard.Dismiss();
 		m_status = status_connect;
 		m_socket = fd;
 
@@ -511,10 +522,8 @@ namespace xhnet
 		setnodelay(m_socket);
 		//setlingerclose(m_socket);
 		
-		if ( peeraddr )
-		{
-			sockaddr2ipport(peeraddr, addrlen, m_peerip, m_peerport);
-		}
+		m_peerip = peerip;
+		m_peerport = peerport;
 
 		socketaddr localaddr;
 		ev_socklen_t locallen = sizeof(localaddr);
@@ -551,7 +560,7 @@ namespace xhnet
 		int recvlen = ::recv(m_socket, recvbuff->GetCurWrite(), recvbuff->AvailWrite(), 0);
 		if (recvlen == 0)
 		{
-			XH_LOG_ERROR(logname_base, "tcpsocket ::recv failed, closed by peer");
+			XH_LOG_INFO(logname_base, "tcpsocket ::recv failed, closed by peer");
 			on_inter_close(tcp_recvfail_closedbypeer, false);
 			return;
 		}
@@ -563,7 +572,7 @@ namespace xhnet
 			}
 			else
 			{
-				XH_LOG_ERROR(logname_base, "tcpsocket ::recv failed, recv -1");
+				XH_LOG_WARN(logname_base, "tcpsocket ::recv failed, recv -1");
 				on_inter_close(tcp_recvfail_recverr, false);
 			}
 			return;
@@ -724,6 +733,9 @@ namespace xhnet
 		if (m_status != status_connect && m_status != status_common) return;
 
 		XH_GUARD([&]{
+			closetcpsocket(m_socket);
+			m_socket = INVALID_SOCKET;
+
 			if (m_io)
 			{
 				if ((m_bassign & 0x01) == 0x01)
@@ -737,9 +749,6 @@ namespace xhnet
 		});
 
 		m_status = status_null;
-
-		closetcpsocket(m_socket);
-		m_socket = INVALID_SOCKET;
 
 		switch (m_type)
 		{
@@ -852,7 +861,7 @@ namespace xhnet
 			break;
 		}
 
-		XH_LOG_ERROR(logname_base, "tcpsocket closed by errid:"<<errid);
+		XH_LOG_INFO(logname_base, "tcpsocket closed by errid:"<<errid);
 	}
 };
 

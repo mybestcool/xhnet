@@ -1,8 +1,15 @@
 
 #include "stdhead.h"
-#include "xhlog.h"
+#include "xh.h"
 
-#include "xhexception.h"
+#ifdef _PLATFORM_WINDOWS_
+#ifdef _DEBUG
+#pragma comment( lib, "../bins/Debug/xh-net.lib" )
+#else
+#pragma comment( lib, "../bins/Release/xh-net.lib" )
+#endif
+#endif
+
 
 void testtraceback()
 {

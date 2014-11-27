@@ -8,13 +8,12 @@
 #include <map>
 #include <functional>
 
-#include <xhhead.h>
-#include <xhref.h>
+#include "xhhead.h"
+#include "xhref.h"
 
 namespace xhnet
 {
 	class CIOBuffer;
-	typedef std::function<void(CIOBuffer* buf)> recycle_buf_cb;
 
 	class CIOBuffer_Exception
 	{
@@ -39,7 +38,7 @@ namespace xhnet
 
 	//区分下 read 和 write的 buffer
 	// 增加set vector map的支持
-	class CIOBuffer : public CPPRef
+	class CIOBuffer : virtual public CPPRef
 	{
 	private:
 		char*	m_pbase;	//缓冲区的头指针
@@ -48,9 +47,17 @@ namespace xhnet
 		char*	m_pend;		//缓冲区的尾指针
 		bool	m_biged;	// 
 		unsigned char m_tag;
-
-		recycle_buf_cb m_cb;
 	public:
+		explicit CIOBuffer(bool biged = false)
+			: m_pbase(0)
+			, m_pread(m_pbase)
+			, m_pwrite(m_pbase)
+			, m_pend(m_pbase)
+			, m_biged(biged)
+		{
+
+		}
+
 		explicit CIOBuffer(char* buff, unsigned int maxlen, bool biged=false)
 			: m_pbase(buff)
 			, m_pread(m_pbase)
@@ -61,7 +68,7 @@ namespace xhnet
 
 		}
 
-		~CIOBuffer()
+		virtual ~CIOBuffer()
 		{
 
 		}
@@ -86,24 +93,12 @@ namespace xhnet
 			return m_tag;
 		}
 
-		// 只允许调用一次，
-		// 调用多次会在对象回收的时候存在线程安全问题
-		void Set_Recycle_Function(recycle_buf_cb cb)
+		void attach(char* buff, unsigned int maxlen)
 		{
-			if (!m_cb) return;
-			m_cb = cb;
-		}
-
-		virtual void delete_this()
-		{
-			if ( m_cb )
-			{
-				m_cb(this);
-			}
-			else
-			{
-				CPPRef::delete_this();
-			}
+			m_pbase		= buff;
+			m_pread		= m_pbase;
+			m_pwrite	= m_pbase;
+			m_pend		= m_pbase + maxlen;
 		}
 
 		unsigned int LengthWrite()
@@ -154,7 +149,7 @@ namespace xhnet
 			return *this;
 		}
 
-	private:
+	protected:
 		// write s
 		CIOBuffer& write_order(const char* p, unsigned int len)
 		{
@@ -289,7 +284,7 @@ namespace xhnet
 			return *this;
 		}
 
-	private:
+	protected:
 		// read s
 		CIOBuffer& read_order(char* p, unsigned int len)
 		{

@@ -16,7 +16,7 @@ namespace xhnet
 	};
 
 	// 所有回调都会在io线程内
-	class ICBTimer : public CPPRef
+	class ICBTimer : virtual public CPPRef
 	{
 	public:
 		virtual ~ICBTimer() { }
@@ -24,7 +24,7 @@ namespace xhnet
 		virtual void On_Timer(unsigned int timerid, int errid) = 0;
 	};
 
-	class ITimer : public CPPRef
+	class ITimer : virtual public CPPRef
 	{
 	public:
 		// 初始化进行二段式初始化

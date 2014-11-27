@@ -2,6 +2,7 @@
 #pragma once
 
 #include <atomic>
+#include <assert.h>
 
 namespace xhnet
 {
@@ -13,18 +14,30 @@ namespace xhnet
 	class CPPRef
 	{
 	public:
+		typedef std::function<void(CPPRef*)> destory_cb;
+
 		virtual ~CPPRef() { }
 
 		void Retain()
 		{
-			++m_ref;
+			if (m_ref.fetch_add(1) == 0)
+			{
+				assert(false);
+			}
 		}
 
 		void Release()
 		{
 			if (m_ref.fetch_sub(1) == 1)
 			{
-				delete_this();
+				if (m_dcb)
+				{
+					m_dcb(this);
+				}
+				else
+				{
+					delete this;
+				}
 			}
 		}
 
@@ -33,9 +46,9 @@ namespace xhnet
 			return m_ref;
 		}
 
-		virtual void delete_this()
+		void Set_DestoryCB(destory_cb cb)
 		{
-			delete this;
+			m_dcb = cb;
 		}
 
 	protected:
@@ -44,7 +57,8 @@ namespace xhnet
 		{
 		}
 
-		std::atomic<unsigned int> m_ref;
+		std::atomic<unsigned int>	m_ref;
+		destory_cb					m_dcb;
 	};
 
 

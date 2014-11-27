@@ -14,7 +14,7 @@ namespace xhnet
 	//
 	// run 只能在一个线程中运行 one thread one run
 	//
-	class IIOServer : public CPPRef
+	class IIOServer : virtual public CPPRef
 	{
 	public:
 		// 初始化进行二段式初始化

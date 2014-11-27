@@ -3,17 +3,24 @@
 
 #include "impl_ioserver.h"
 
-#include <xhguard.h>
-#include <xhlog.h>
+#include "xhguard.h"
+#include "xhlog.h"
 
 
 namespace xhnet
 {
 	ITimer* ITimer::Create(void)
 	{
-		return new CTimer();
+		CTimer* timer = CTimer::m_pool.New_Object();
+		if ( timer )
+		{
+			timer->Set_DestoryCB([](CPPRef* ref){ CTimer::m_pool.Delete_Object(dynamic_cast<CTimer*>(ref)); });
+		}
+
+		return timer;
 	}
 
+	COPool<CTimer, std::mutex> CTimer::m_pool;
 
 	static unsigned int gen_timertid()
 	{
@@ -108,6 +115,7 @@ namespace xhnet
 		}
 
 		m_status = status_begin;
+		m_ms = ms;
 
 		m_io->Reset_Event(&m_ev_timer, INVALID_SOCKET, 0, &(CTimer::on_timer_callback), this);
 		m_io->Add_Timer(this);

@@ -55,7 +55,7 @@ namespace xhnet
 	//
 	//
 	//
-	class ICBTcpListener : public CPPRef
+	class ICBTcpListener : virtual public CPPRef
 	{
 	public:
 		virtual ~ICBTcpListener() { }
@@ -65,7 +65,7 @@ namespace xhnet
 		virtual void On_Close(unsigned int socketid, int errid) = 0;
 	};
 
-	class ICBTcpAccepter : public CPPRef
+	class ICBTcpAccepter : virtual public CPPRef
 	{
 	public:
 		virtual ~ICBTcpAccepter() { }
@@ -76,7 +76,7 @@ namespace xhnet
 		virtual void On_Close(unsigned int socketid, int errid) = 0;
 	};
 
-	class ICBTcpConneter : public CPPRef
+	class ICBTcpConneter : virtual public CPPRef
 	{
 	public:
 		virtual ~ICBTcpConneter() { }
@@ -87,7 +87,7 @@ namespace xhnet
 		virtual void On_Close(unsigned int socketid, int errid) = 0;
 	};
 
-	class ITcpSocket : public CPPRef
+	class ITcpSocket : virtual public CPPRef
 	{
 	public:
 		// 对socket初始化进行二段式初始化

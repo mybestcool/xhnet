@@ -181,7 +181,7 @@ namespace xhnet
 
 	//
 	// 目录， 传入目录编码以系统为系统编码
-	std::string	GetModulePath(void)
+	std::string	GetModuleDir(void)
 	{
 #if defined _PLATFORM_WINDOWS_
 
@@ -219,24 +219,24 @@ namespace xhnet
 #endif
 	}
 
-	bool CreateDirectory(const std::string& path)
+	bool MakeDir(const std::string& dir)
 	{
 		bool ret = false;
 #if defined _PLATFORM_WINDOWS_
-		if (_access(path.c_str(), 0)==0)
+		if (_access(dir.c_str(), 0) == 0)
 		{
 			ret = true;
 		}
-		else if (0 == _mkdir(path.c_str()))
+		else if (0 == _mkdir(dir.c_str()))
 		{
 			ret = true;
 		}
 #elif defined _PLATFORM_LINUX_
-		if (access(path.c_str(), F_OK) == 0)
+		if (access(dir.c_str(), F_OK) == 0)
 		{
 			ret = true;
 		}
-		else if (0 == mkdir(path.c_str(), 0755))
+		else if (0 == mkdir(dir.c_str(), 0755))
 		{
 			ret = true;
 		}
@@ -244,29 +244,27 @@ namespace xhnet
 		return ret;
 	}
 
-	bool IsSamePath(const std::string& path1, const std::string& path2)
+	bool IsSameDir(const std::string& dir1, const std::string& dir2)
 	{
 #if defined _PLATFORM_WINDOWS_
-		char fullpath1[_MAX_PATH] = { 0 };
-		char fullpath2[_MAX_PATH] = { 0 };
+		char fulldir1[_MAX_PATH] = { 0 };
+		char fulldir2[_MAX_PATH] = { 0 };
 
-		_fullpath(fullpath1, path1.c_str(), sizeof(fullpath1));
-		_fullpath(fullpath2, path2.c_str(), sizeof(fullpath2));
+		_fullpath(fulldir1, dir1.c_str(), sizeof(fulldir1));
+		_fullpath(fulldir2, dir2.c_str(), sizeof(fulldir2));
 
-		return strcmp(fullpath1, fullpath2) == 0;
+		return strcmp(fulldir1, fulldir2) == 0;
 
 #elif defined _PLATFORM_LINUX_
-		char fullpath1[1024] = { 0 };
-		char fullpath2[1024] = { 0 };
+		char fulldir1[1024] = { 0 };
+		char fulldir2[1024] = { 0 };
 
-		realpath(path1.c_str(), fullpath1);
-		realpath(path2.c_str(), fullpath2);
+		realpath(dir1.c_str(), fulldir1);
+		realpath(dir2.c_str(), fulldir2);
 
-		return strcmp(fullpath1, fullpath2) == 0;
+		return strcmp(fulldir1, fulldir2) == 0;
 #endif
 	}
-
-
 
 	//
 	// 时间，time_t使用UTC时间， tm为当地时间
@@ -761,8 +759,17 @@ namespace xhnet
 		static std::random_device rd;
 		static std::mt19937 mt(rd());
 
+		if ( min>max )
+		{
+			std::swap(min, max);
+		}
+		else if ( min==max )
+		{
+			return min;
+		}
+
 		unsigned int value = mt();
-		unsigned int outvalue = value % (max - min + 1);
+		unsigned int outvalue = value % (max - min);
 
 		return outvalue + min;
 	}

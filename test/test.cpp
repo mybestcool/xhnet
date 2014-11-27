@@ -1,6 +1,16 @@
 
 
-#include <xh.h>
+#include "stdhead.h"
+#include "xh.h"
+
+#ifdef _PLATFORM_WINDOWS_
+#ifdef _DEBUG
+#pragma comment( lib, "../bins/Debug/xh-net.lib" )
+#else
+#pragma comment( lib, "../bins/Release/xh-net.lib" )
+#endif
+#endif
+
 
 #if defined _PLATFORM_WINDOWS_
 #include <windows.h>
@@ -44,6 +54,10 @@ public:
 	CAccepter(ITcpSocket* a)
 		: m_socket( a )
 	{
+		if (m_socket)
+		{
+			m_socket->Retain();
+		}
 		accepter_opentimes++;
 	}
 	virtual ~CAccepter() 
@@ -68,7 +82,11 @@ public:
 			{
 				char* cbuff = new char[1024];
 				CIOBuffer* buff = new CIOBuffer(cbuff, 1024);
-				buff->Set_Recycle_Function([](CIOBuffer* inbuf){delete[] inbuf->GetBuffer(); delete inbuf; });
+				buff->Set_DestoryCB([](CPPRef* ref)
+				{
+					CIOBuffer* tempbuff = dynamic_cast<CIOBuffer*>(ref);
+					delete[] tempbuff->GetBuffer(); delete tempbuff;
+				});
 
 				m_socket->Async_RecvSome(buff);
 
@@ -80,7 +98,11 @@ public:
 				char* cbuff = new char[1024];
 				CIOBuffer* buff = new CIOBuffer(cbuff, 1024);
 				*buff << 10;
-				buff->Set_Recycle_Function([](CIOBuffer* inbuf){delete[] inbuf->GetBuffer(); delete inbuf; });
+				buff->Set_DestoryCB([](CPPRef* ref)
+				{
+					CIOBuffer* tempbuff = dynamic_cast<CIOBuffer*>(ref);
+					delete[] tempbuff->GetBuffer(); delete tempbuff;
+				}); 
 
 				m_socket->Async_Send(buff);
 
@@ -126,7 +148,11 @@ public:
 			{
 				char* cbuff = new char[1024];
 				CIOBuffer* buff = new CIOBuffer(cbuff, 1024);
-				buff->Set_Recycle_Function([](CIOBuffer* inbuf){delete[] inbuf->GetBuffer(); delete inbuf; });
+				buff->Set_DestoryCB([](CPPRef* ref)
+				{
+					CIOBuffer* tempbuff = dynamic_cast<CIOBuffer*>(ref);
+					delete[] tempbuff->GetBuffer(); delete tempbuff;
+				});
 
 				m_socket->Async_RecvSome(buff);
 
@@ -138,7 +164,11 @@ public:
 				char* cbuff = new char[1024];
 				CIOBuffer* buff = new CIOBuffer(cbuff, 1024);
 				*buff << 10;
-				buff->Set_Recycle_Function([](CIOBuffer* inbuf){delete[] inbuf->GetBuffer(); delete inbuf; });
+				buff->Set_DestoryCB([](CPPRef* ref)
+				{
+					CIOBuffer* tempbuff = dynamic_cast<CIOBuffer*>(ref);
+					delete[] tempbuff->GetBuffer(); delete tempbuff;
+				});
 
 				m_socket->Async_Send(buff);
 
@@ -241,7 +271,11 @@ public:
 			{
 				char* cbuff = new char[1024];
 				CIOBuffer* buff = new CIOBuffer(cbuff, 1024);
-				buff->Set_Recycle_Function([](CIOBuffer* inbuf){delete[] inbuf->GetBuffer(); delete inbuf; });
+				buff->Set_DestoryCB([](CPPRef* ref)
+				{
+					CIOBuffer* tempbuff = dynamic_cast<CIOBuffer*>(ref);
+					delete[] tempbuff->GetBuffer(); delete tempbuff;
+				});
 
 				m_socket->Async_RecvSome(buff);
 
@@ -253,7 +287,11 @@ public:
 				char* cbuff = new char[1024];
 				CIOBuffer* buff = new CIOBuffer(cbuff, 1024);
 				*buff << 10;
-				buff->Set_Recycle_Function([](CIOBuffer* inbuf){delete[] inbuf->GetBuffer(); delete inbuf; });
+				buff->Set_DestoryCB([](CPPRef* ref)
+				{
+					CIOBuffer* tempbuff = dynamic_cast<CIOBuffer*>(ref);
+					delete[] tempbuff->GetBuffer(); delete tempbuff;
+				});
 
 				m_socket->Async_Send(buff);
 
@@ -298,7 +336,11 @@ public:
 			{
 				char* cbuff = new char[1024];
 				CIOBuffer* buff = new CIOBuffer(cbuff, 1024);
-				buff->Set_Recycle_Function([](CIOBuffer* inbuf){delete[] inbuf->GetBuffer(); delete inbuf; });
+				buff->Set_DestoryCB([](CPPRef* ref)
+				{
+					CIOBuffer* tempbuff = dynamic_cast<CIOBuffer*>(ref);
+					delete[] tempbuff->GetBuffer(); delete tempbuff;
+				});
 
 				m_socket->Async_RecvSome(buff);
 
@@ -311,7 +353,11 @@ public:
 				char* cbuff = new char[1024];
 				CIOBuffer* buff = new CIOBuffer(cbuff, 1024);
 				*buff << 10;
-				buff->Set_Recycle_Function([](CIOBuffer* inbuf){delete[] inbuf->GetBuffer(); delete inbuf; });
+				buff->Set_DestoryCB([](CPPRef* ref)
+				{
+					CIOBuffer* tempbuff = dynamic_cast<CIOBuffer*>(ref);
+					delete[] tempbuff->GetBuffer(); delete tempbuff;
+				});
 
 				m_socket->Async_Send(buff);
 
@@ -331,16 +377,10 @@ public:
 		XH_LOG_INFO(logname_base, "connecter closed socketid:" << socketid << "err:" << errid);
 
 		// 连接失败 重连
-		if (GenRandUINT(0, 10) != 0)
+		if (GenRandUINT(0, 10) != 0
+			&& m_socket->Connect("127.0.0.1", 5555) )
 		{
-			if (m_socket->Connect("127.0.0.1", 5555))
-			{
-				return;
-			}
-			else
-			{
-				XH_LOG_ERROR(logname_base, "connecter reconnect failed, socketid:" << socketid);
-			}
+			return;
 		}
 
 		{
@@ -360,7 +400,7 @@ public:
 void connect_thread(void)
 {
 #ifdef _RANDOM_TEST_
-	int total = 1000;// GenRandUINT(0, 10);
+	int total = 1;// GenRandUINT(0, 10);
 #else
 	int total = 10;// GenRandUINT(0, 10);
 #endif // _RANDOM_TEST_
@@ -392,7 +432,7 @@ int main( int argc, char** argv )
 
 	XH_OPEN_CONSOLELOGGER();
 	XH_ADD_LOGGER(logname_base, "net", LOGLEVEL_ALL);
-	//XH_ADD_LOGGER(logname_trace, "trace", LOGLEVEL_ALL);
+	XH_ADD_LOGGER(logname_trace, "trace", LOGLEVEL_ALL);
 	
 	std::vector<std::string> out = IIOServer::Resolve_DNS("www.sanguosha.com");
 

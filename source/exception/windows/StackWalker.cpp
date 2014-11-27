@@ -86,7 +86,7 @@
 #pragma comment(lib, "version.lib")  // for "VerQueryValue"
 #pragma warning(disable:4826)
 
-#include <xhhead.h>
+#include "xhhead.h"
 
 #if defined _PLATFORM_WINDOWS_
 

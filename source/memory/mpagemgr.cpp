@@ -124,8 +124,6 @@ namespace xhnet
 		assert(m_recycle_size > 0 && "recyle free page size <=0");
 
 		m_all_pages = 0;
-		m_free_pages = 0;
-		m_using_map = 0;
 
 		m_cur_allocpage = 0;
 	}
@@ -138,11 +136,9 @@ namespace xhnet
 		m_recycle_size = DEFAULT_START_RECYCLE_SIZE;
 	}
 
-	void* CSameSizeMPageMgr::Allocate(void)
+	void* CSameSizeMPageMgr::AllocateFromPage(CMPage*& allocfrompage)
 	{
 		assert(m_all_pages &&"has not init all pages");
-		assert(m_free_pages &&"has not init  free pages");
-		assert(m_using_map &&"has not init using map");
 
 		if (m_cur_allocpage&&m_cur_allocpage->Is_Empty())
 		{
@@ -163,7 +159,7 @@ namespace xhnet
 
 			if (!m_cur_allocpage)
 			{
-				m_cur_allocpage = m_free_pages->Pop();
+				m_cur_allocpage = m_free_pages.Pop();
 				if (m_cur_allocpage)
 				{
 					if (m_cur_allocpage->Reset(m_block_size, m_align_size))
@@ -191,50 +187,44 @@ namespace xhnet
 			return 0;
 		}
 
-		void* allocated = m_cur_allocpage->Allocate();
-		if (allocated)
-		{
-			m_using_map->Push(allocated, m_cur_allocpage);
-		}
+		allocfrompage = m_cur_allocpage;
 
-		return allocated;
+		return m_cur_allocpage->Allocate();
 	}
 
-	void CSameSizeMPageMgr::Free(void* ptr)
+	void CSameSizeMPageMgr::FreeToPage(void* ptr, CMPage* freetopage)
 	{
-		CMPage* needfreepage = m_using_map->Pop(ptr);
-
-		if (!needfreepage)
+		if (!freetopage)
 		{
 			assert(false && "not this allocate ptr");
 			return;
 		}
-		needfreepage->Free(ptr);
+		freetopage->Free(ptr);
 
-		// needfreepage 的内容已经回收完整了
-		if (!needfreepage->Is_Intact())
+		// freetopage 的内容已经回收完整了
+		if (!freetopage->Is_Intact())
 		{
 			return;
 		}
 
 		// 是当前的使用的page，则不回收
-		if (m_cur_allocpage == needfreepage)
+		if (m_cur_allocpage == freetopage)
 		{
 			return;
 		}
 
 		// 从使用队列里剔除
-		m_using_pages.Erase(needfreepage);
+		m_using_pages.Erase(freetopage);
 
 		// 如果需要释放到操作系统
-		if (m_free_pages->Size() >= m_recycle_size)
+		if (m_free_pages.Size() >= m_recycle_size)
 		{
-			m_all_pages->Erase(needfreepage);
-			delete needfreepage;
+			m_all_pages->Erase(freetopage);
+			delete freetopage;
 		}
 		else
 		{
-			m_free_pages->Push(needfreepage);
+			m_free_pages.Push(freetopage);
 		}
 	}
 
@@ -271,34 +261,33 @@ namespace xhnet
 		
 	CMPageMgr::~CMPageMgr(void)
 	{
-		m_using_pages.Clear(true);
+		for (xh_page_map<unsigned long, CSameSizeMPageMgr*>::iterator it = m_using_pages.begin(); it != m_using_pages.end(); ++it)
+		{
+			if ( it->second )
+			{
+				delete it->second;
+			}
+		}
+		m_using_pages.clear();
 
-		m_free_pages.Clear(true);
 		m_all_pages.Clear(true);
 
-		m_using_map.Clear(false);
+		m_using_map.clear();
 	}
 
 	void* CMPageMgr::Allocate(unsigned long block_size, unsigned long align_size)
 	{
 		unsigned long aligned_block_size = CMPage::Calc_AlignedSize(block_size, align_size);
 
-		CSameSizeMPageMgr* mgr = m_using_pages.Find(aligned_block_size);
+		CSameSizeMPageMgr* mgr = 0;
+		xh_page_map<unsigned long, CSameSizeMPageMgr*>::iterator it = m_using_pages.find(aligned_block_size);
+		if (it != m_using_pages.end() )
+		{
+			mgr = it->second;
+		}
+		
 		if (!mgr)
 		{
-			unsigned long page_size = CMPage::Calc_PageSize(block_size, align_size, aligned_block_size);
-
-			CPageList* freepages = m_free_pages.Find(page_size);
-			if ( !freepages )
-			{
-				freepages = new CPageList();
-				if (!freepages)
-				{
-					return 0;
-				}
-				m_free_pages.Push(page_size, freepages);
-			}
-
 			mgr = new CSameSizeMPageMgr(block_size, align_size, m_recycle_size);
 			if ( !mgr )
 			{
@@ -306,10 +295,7 @@ namespace xhnet
 			}
 
 			mgr->Set_AllPages(&m_all_pages);
-			mgr->Set_FreePages(freepages);
-			mgr->Set_UsingMap(&m_using_map);
-
-			m_using_pages.Push(aligned_block_size, mgr);
+			m_using_pages[aligned_block_size] = mgr;
 		}
 
 		if ( !mgr )
@@ -317,21 +303,33 @@ namespace xhnet
 			return 0;
 		}
 
-		return mgr->Allocate();
+		CMPage* allocfrompage = 0;
+		void* allocated = mgr->AllocateFromPage(allocfrompage);
+		if (allocated)
+		{
+			m_using_map[allocated] = UsingBlockInfo(mgr, allocfrompage);
+		}
+
+		return allocated;
 	}
 
 	void CMPageMgr::Free(void* ptr)
 	{
-		CMPage* page = m_using_map.Find(ptr);
-		if ( !page )
+		CSameSizeMPageMgr* mgr = 0;
+		CMPage* page = 0;
+
+		xh_page_map<void*, UsingBlockInfo>::iterator it = m_using_map.find(ptr);
+		if (it != m_using_map.end())
 		{
-			return;
+			mgr = it->second.ppool;
+			page = it->second.ppage;
+
+			m_using_map.erase(it);
 		}
 
-		CSameSizeMPageMgr* mgr = m_using_pages.Find(page->Get_BlockSize());
-		if ( mgr )
+		if ( mgr && page )
 		{
-			mgr->Free(ptr);
+			mgr->FreeToPage(ptr, page);
 		}
 	}
 

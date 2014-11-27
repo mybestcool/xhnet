@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 
-#include <xhhead.h>
+#include "xhhead.h"
 #include "log/stacktrace.h"
 #include "xhlog.h"
 

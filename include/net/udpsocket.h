@@ -25,7 +25,7 @@ namespace xhnet
 	};
 
 	// 所有回调都会在io线程内
-	class ICBUdpSocket : public CPPRef
+	class ICBUdpSocket : virtual public CPPRef
 	{
 	public:
 		virtual ~ICBUdpSocket() { }
@@ -35,7 +35,7 @@ namespace xhnet
 		virtual void On_Recv(unsigned int socketid, int errid, const std::string& ip, unsigned int port, CIOBuffer* buffer) = 0;
 	};
 
-	class IUdpSocket : public CPPRef
+	class IUdpSocket : virtual public CPPRef
 	{
 	public:
 		// 对socket初始化进行二段式初始化

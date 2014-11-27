@@ -1,9 +1,9 @@
 
 #include "impl_ioserver.h"
 
-#include <xhhead.h>
-#include <xhlog.h>
-#include <xhexception.h>
+#include "xhhead.h"
+#include "xhlog.h"
+#include "xhexception.h"
 
 #if defined _PLATFORM_WINDOWS_
 #pragma comment( lib, "libevent/lib/libevent_core.lib" )
@@ -17,11 +17,18 @@
 
 namespace xhnet
 {
-
 	IIOServer* IIOServer::Create()
 	{
-		return new CIOServer();
+		CIOServer* io = CIOServer::m_pool.New_Object();
+		if ( io )
+		{
+			io->Set_DestoryCB([](CPPRef* ref){ CIOServer::m_pool.Delete_Object(dynamic_cast<CIOServer*>(ref)); });
+		}
+
+		return io;
 	}
+
+	COPool<CIOServer, std::mutex> CIOServer::m_pool;
 
 	std::vector<std::string> IIOServer::Resolve_DNS(const std::string& hostname)
 	{
@@ -337,54 +344,61 @@ namespace xhnet
 
 	void CIOServer::real_post(bool bfinished)
 	{
-		if (bfinished)
+		try
 		{
-			m_status = status_null;
-			return;
-		}
-
-		bool bret = (m_binit
-			|| m_tcpsockets.size() > 0
-			|| m_udpsockets.size() > 0
-			|| m_timers.size() >0
-			|| m_haspostdata);
-
-		if (!bret)
-		{
-			m_posttimer->Fini();
-			return;
-		}
-
-		if (!m_binit)
-		{
-			for (auto it = m_tcpsockets.begin(); it != m_tcpsockets.end(); ++it)
+			if (bfinished)
 			{
-				it->second->Fini();
+				m_status = status_null;
+				return;
 			}
 
-			for (auto it = m_udpsockets.begin(); it != m_udpsockets.end(); ++it)
+			bool bret = (m_binit
+				|| m_tcpsockets.size() > 0
+				|| m_udpsockets.size() > 0
+				|| m_timers.size() > 0
+				|| m_haspostdata);
+
+			if (!bret)
 			{
-				it->second->Fini();
+				m_posttimer->Fini();
+				return;
 			}
 
-			for (auto it = m_timers.begin(); it != m_timers.end(); ++it)
+			if (!m_binit)
 			{
-				it->second->Fini();
+				for (auto it = m_tcpsockets.begin(); it != m_tcpsockets.end(); ++it)
+				{
+					it->second->Fini();
+				}
+
+				for (auto it = m_udpsockets.begin(); it != m_udpsockets.end(); ++it)
+				{
+					it->second->Fini();
+				}
+
+				for (auto it = m_timers.begin(); it != m_timers.end(); ++it)
+				{
+					it->second->Fini();
+				}
+			}
+
+			std::queue<postio>* pcur = 0;
+			{
+				std::lock_guard<std::mutex> guard(m_postmutex);
+				pcur = &(m_postdata[m_curpost]);
+				m_curpost = (m_curpost + 1) % 2;
+				m_haspostdata = false;
+			}
+
+			while (!pcur->empty())
+			{
+				pcur->front()();
+				pcur->pop();
 			}
 		}
-
-		std::queue<postio>* pcur = 0;
+		catch (...)
 		{
-			std::lock_guard<std::mutex> guard(m_postmutex);
-			pcur = &(m_postdata[m_curpost]);
-			m_curpost = (m_curpost+1) % 2;
-			m_haspostdata = false;
-		}
-
-		while (!pcur->empty())
-		{
-			pcur->front()();
-			pcur->pop();
+			XH_LOG_ERROR(logname_base, "IOServer post catch err");
 		}
 	}
 };

@@ -7,5 +7,6 @@
 #include "xhref.h"
 #include "xhlog.h"
 #include "xhutility.h"
+#include "xhpool.h"
 #include "xhnet.h"
 

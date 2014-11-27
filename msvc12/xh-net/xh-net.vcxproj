@@ -17,14 +17,14 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -42,11 +42,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)bins\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)bins\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,6 +98,7 @@
     <ClInclude Include="..\..\dependencies\windows\log4cplus\include\log4cplus\logger.h" />
     <ClInclude Include="..\..\dependencies\windows\log4cplus\include\log4cplus\loglevel.h" />
     <ClInclude Include="..\..\dependencies\windows\log4cplus\include\log4cplus\win32consoleappender.h" />
+    <ClInclude Include="..\..\include\exception\smart_assert.h" />
     <ClInclude Include="..\..\include\exception\traceback.h" />
     <ClInclude Include="..\..\include\log\actionstat.h" />
     <ClInclude Include="..\..\include\log\filelog.h" />
@@ -126,7 +127,6 @@
     <ClInclude Include="..\..\include\xhref.h" />
     <ClInclude Include="..\..\include\xhutility.h" />
     <ClInclude Include="..\..\source\exception\ensure.h" />
-    <ClInclude Include="..\..\source\exception\smart_assert.h" />
     <ClInclude Include="..\..\source\exception\windows\StackWalker.h" />
     <ClInclude Include="..\..\source\net\impl_ioserver.h" />
     <ClInclude Include="..\..\source\net\impl_nethead.h" />
@@ -150,7 +150,6 @@
     <ClCompile Include="..\..\source\net\impl_timer.cpp" />
     <ClCompile Include="..\..\source\net\impl_udpsocket.cpp" />
     <ClCompile Include="..\..\source\utility\utility.cpp" />
-    <ClCompile Include="..\..\test\test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

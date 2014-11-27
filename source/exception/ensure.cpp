@@ -1,10 +1,10 @@
 
 //#define SMART_ASSERT_DEBUG_MODE	1
-#include "smart_assert.h"
+#include "exception/smart_assert.h"
 
 #include <sstream>
 #include "ensure.h"
-#include <xhlog.h>
+#include "xhlog.h"
 
 namespace xhnet
 {

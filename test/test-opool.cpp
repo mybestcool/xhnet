@@ -1,28 +1,15 @@
 
-#include "../include/stdhead.h"
-#include "../include/xhguard.h"
+#include "stdhead.h"
+#include "xh.h"
 
-//#include "../3_libiconv-win32/include/iconv.h"
-//#pragma comment( lib, "../3_libiconv-win32/lib/iconv.lib" )
+#ifdef _PLATFORM_WINDOWS_
+#ifdef _DEBUG
+#pragma comment( lib, "../bins/Debug/xh-net.lib" )
+#else
+#pragma comment( lib, "../bins/Release/xh-net.lib" )
+#endif
+#endif
 
-#include "memory/mpool.h"
-#include "memory/opool.h"
-#include "thread/nullmutex.h"
-
-//bool conv_string(const string& from, const string to, char* in, unsigned int inlen, char* out, unsigned int outlen)
-//{
-//	iconv_t h = iconv_open(to.c_str(), from.c_str());
-//	if ( iconv_t(-1) == h ) return false;
-//
-//	XH_GUARD([&]{ iconv_close(h); });
-//
-//	if (size_t(-1) == iconv(h, (const char **)&in, &inlen, &out, &outlen))
-//	{
-//		return false;
-//	}
-//
-//	return true;
-//}
 
 struct Test0
 {
@@ -45,13 +32,6 @@ struct Test2 : public xhnet::CInheritOPool<Test2, std::mutex>
 
 int main( int argc, char** argv )
 {
-	//char gbk_1[] = "ÆÆÏþµÄ²©¿Í";
-	//char utf8_1[100] = { 0 };
-	//char gbk_2[100] = { 0 };
-
-	//size_t len0 = conv_string("GBK", "UTF-8", gbk_1, strlen(gbk_1), utf8_1, sizeof(utf8_1));
-	//size_t len1 = conv_string("utf-8", "gbk", utf8_1, strlen(utf8_1), gbk_2, sizeof(gbk_2));
-
 	xhnet::COPool<Test0, std::mutex> mpool0;
 	xhnet::COPool<Test1, std::mutex> mpool1;
 

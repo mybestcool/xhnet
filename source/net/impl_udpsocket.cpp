@@ -3,14 +3,22 @@
 
 #include "impl_ioserver.h"
 
-#include <xhguard.h>
+#include "xhguard.h"
 
 namespace xhnet
 {
 	IUdpSocket* IUdpSocket::Create(void)
 	{
-		return new CUdpSocket();
+		CUdpSocket* socket = CUdpSocket::m_pool.New_Object();
+		if ( socket )
+		{
+			socket->Set_DestoryCB([](CPPRef* ref){ CUdpSocket::m_pool.Delete_Object(dynamic_cast<CUdpSocket*>(ref)); });
+		}
+
+		return socket;
 	}
+
+	COPool<CUdpSocket, std::mutex> CUdpSocket::m_pool;
 
 	static unsigned int gen_udp_socketid()
 	{

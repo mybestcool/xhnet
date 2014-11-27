@@ -2,9 +2,18 @@
 #include <xh.h>
 #include <thread>
 
-#include "../source/net/impl_nethead.h"
+//#include "../source/net/impl_nethead.h"
 
 using namespace std;
+
+#ifdef _PLATFORM_WINDOWS_
+#ifdef _DEBUG
+#pragma comment( lib, "../bins/Debug/xh-net.lib" )
+#else
+#pragma comment( lib, "../bins/Release/xh-net.lib" )
+#endif
+#endif
+
 
 class CTest : public xhnet::CPPRef
 {
@@ -27,27 +36,27 @@ void threadsubfun()
 
 int main( int argc, char** argv )
 {
-	// ip v4 test
-	{
-		xhnet::socketaddr addr;
-		ev_socklen_t addrlen = 0;
-		bool bret = xhnet::ipport2sockaddr("127.0.0.1", 5555, &addr, addrlen);
+	//// ip v4 test
+	//{
+	//	xhnet::socketaddr addr;
+	//	ev_socklen_t addrlen = 0;
+	//	bool bret = xhnet::ipport2sockaddr("127.0.0.1", 5555, &addr, addrlen);
 
-		std::string ip;
-		unsigned int port = 0;
-		bret = xhnet::sockaddr2ipport(&addr, addrlen, ip, port);
-	}
+	//	std::string ip;
+	//	unsigned int port = 0;
+	//	bret = xhnet::sockaddr2ipport(&addr, addrlen, ip, port);
+	//}
 
-	// ip v6 test
-	{
-		xhnet::socketaddr addr;
-		ev_socklen_t addrlen = 0;
-		bool bret = xhnet::ipport2sockaddr("[fe80::4c00:bbad:a546:fbf6]", 5555, &addr, addrlen);
+	//// ip v6 test
+	//{
+	//	xhnet::socketaddr addr;
+	//	ev_socklen_t addrlen = 0;
+	//	bool bret = xhnet::ipport2sockaddr("[fe80::4c00:bbad:a546:fbf6]", 5555, &addr, addrlen);
 
-		std::string ip;
-		unsigned int port = 0;
-		bret = xhnet::sockaddr2ipport(&addr, addrlen, ip, port);
-	}
+	//	std::string ip;
+	//	unsigned int port = 0;
+	//	bret = xhnet::sockaddr2ipport(&addr, addrlen, ip, port);
+	//}
 
 	
 	// io buffer test

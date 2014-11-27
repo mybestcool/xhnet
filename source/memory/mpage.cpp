@@ -13,6 +13,9 @@ namespace xhnet
 		, m_allblock_num(0), m_page_size(0)
 		, m_align_size(0), m_block_size(0)
 	{
+		if (block_size < 1)	block_size = 1;
+		if (align_size < 1) align_size = 1;
+
 		create(block_size, align_size);
 	}
 
@@ -23,10 +26,14 @@ namespace xhnet
 
 	bool CMPage::Reset(unsigned long block_size, unsigned long align_size)
 	{
-		if (!Is_Intact())
-		{
+		if (block_size < 0)
 			return false;
-		}
+
+		if (align_size < 0)
+			return false;
+
+		if (!Is_Intact())
+			return false;
 
 		if ( m_block_size==block_size && m_align_size==align_size )
 		{
@@ -43,9 +50,9 @@ namespace xhnet
 		{
 			m_freeblock_num = m_allblock_num;
 
-			assert(isaligned(m_memory, m_align_size) && "memory not aligned");
+			assert(isaligned(m_block, m_align_size) && "memory not aligned");
 
-			m_freeblock_head = (FreeBlock*)m_memory;
+			m_freeblock_head = (FreeBlock*)m_block;
 			m_freeblock_head->next = 0;
 		}
 	}
@@ -97,103 +104,75 @@ namespace xhnet
 		return aligned_blocksize;
 	}
 
-	unsigned long CMPage::Calc_PageSize(unsigned long block_size, unsigned long align_size, unsigned long aligned_block_size)
+	unsigned long CMPage::Calc_PageSize(unsigned long block_size, unsigned long align_size)
 	{
-		unsigned long pointersize = sizeof(FreeBlock*);
-		unsigned long moresize = aligned_block_size - block_size + pointersize;
+		unsigned long aligned_block_size = Calc_AlignedSize(block_size, align_size);
+		unsigned long maxfilledsize = align_size - 1;
 
-		unsigned long pagesize = 0;
-		if (aligned_block_size + moresize > DEFAULT_PAGESIZE)
+		unsigned long pagesize = DEFAULT_PAGESIZE;
+
+		if (aligned_block_size + maxfilledsize > DEFAULT_PAGESIZE)
 		{
-			pagesize = aligned_block_size + moresize;
-		}
-		else
-		{
-			pagesize = DEFAULT_PAGESIZE;
+			pagesize = aligned_block_size + maxfilledsize;
 		}
 
 		return pagesize;
 	}
 
-	unsigned long CMPage::Calc_PageSize(unsigned long block_size, unsigned long align_size)
-	{
-		return Calc_PageSize(block_size, align_size, Calc_AlignedSize(block_size, align_size));
-	}
-
 	void CMPage::create(unsigned long block_size, unsigned long align_size)
 	{
+		unsigned long src_pagesize = Get_PageSize();
+
 		// 得到对齐后的一个block的内存大小，每个block必须大于sizeof(FreeBlock*)
-		m_block_size = Calc_AlignedSize(block_size, align_size);
+		m_block_size	= Calc_AlignedSize(block_size, align_size);
+		m_align_size	= align_size;
 
-		// 分配足够的内存, 这里的算法很经典, 早期的STL中使用的就是这个算法  
 		// 首先是维护FreeBlock指针占用的内存大小  
-		unsigned long pointersize = sizeof(FreeBlock*);
-		unsigned long moresize = m_block_size - block_size + pointersize;
+		//unsigned long pointersize	= sizeof(FreeBlock*);
+		unsigned long maxfilledsize = m_align_size - 1;
 
-		if (m_block_size + moresize > DEFAULT_PAGESIZE)
+		if (m_block_size + maxfilledsize > DEFAULT_PAGESIZE)
 		{
-			m_align_size	= align_size;
-			m_page_size		= m_block_size + moresize;
+			m_page_size		= m_block_size + maxfilledsize;
 			m_allblock_num	= 1;
-			m_freeblock_num = m_allblock_num;
 		}
 		else
 		{
-			m_align_size	= align_size;
 			m_page_size		= DEFAULT_PAGESIZE;
-			m_allblock_num	= (m_page_size - moresize) / m_block_size;
-			m_freeblock_num = m_allblock_num;
+			m_allblock_num	= (m_page_size - maxfilledsize) / m_block_size;
 		}
+
+		m_freeblock_num = m_allblock_num;
 
 		// 如果原来的跟现在的内存一样大小 就不再分配
-		unsigned long src_pagesize = Get_PageSize();
-		void* src_raw = 0;
-		if (m_memory)
+		if (m_memory || src_pagesize != m_page_size)
 		{
-			src_raw = *(void**)(cast2uint(m_memory) - pointersize);
-		}
-		void* raw = 0;
-		if (src_raw)
-		{
-			if (src_pagesize == m_page_size)
+			if (m_memory)
 			{
-				raw = src_raw;
+				::free(m_memory);
 			}
-			else
-			{
-				::free(src_raw);
-				raw = ::malloc(m_page_size);
-			}
-		}
-		else
-		{
-			// 分配的实际大小就是20000 + 7 = 20007  
-			raw = ::malloc(m_page_size);
+
+			m_memory = ::malloc(m_page_size);
 		}
 
-		// 这里实Pool真正为对象实例分配的内存地址  
-		unsigned long start = cast2uint(raw) + moresize;
-		void* aligned = (void*)((start + m_align_size - 1)&(~(m_align_size - 1)));
+		m_block = getaligned(m_memory, m_align_size);
 
-		// 这里维护一个指向malloc()真正分配的内存  
-		*(void**)(cast2uint(aligned) - pointersize) = raw;
-
-		m_memory = aligned;
-
-		// 检测分配内存是否满足内存对齐条件, 不过个人感觉没必要进行检测  
-		assert(isaligned(m_memory, m_align_size) && "memory not aligned");
+		// 检测分配内存是否满足内存对齐条件,
+		assert(isaligned(m_block, m_align_size) && "memory not aligned");
 
 		// 将FreeBlock链表头设置为分配的值  
-		m_freeblock_head = (FreeBlock*)m_memory;
+		m_freeblock_head = (FreeBlock*)m_block;
 		m_freeblock_head->next = 0;
 	}
 
 	void CMPage::destory(void)
 	{
 		// 释放操作很简单了, 参见上图  
-		void* raw = *(void**)(cast2uint(m_memory) - sizeof(void*));
-		::free(raw);
-		m_memory = 0;
+		if (m_memory)
+		{
+			::free(m_memory);
+			m_memory = 0;
+		}
 	}
 
 	CMPage::FreeBlock* CMPage::allocateblock()

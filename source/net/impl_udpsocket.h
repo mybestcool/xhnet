@@ -7,7 +7,7 @@ namespace xhnet
 {
 	class CIOServer;
 
-	class CUdpSocket : public IUdpSocket, public CInheritOPool<CUdpSocket, std::mutex>
+	class CUdpSocket : public IUdpSocket
 	{
 	public:
 		enum status
@@ -96,5 +96,8 @@ namespace xhnet
 	private:
 		CUdpSocket(const CUdpSocket&) = delete;
 		CUdpSocket& operator=(const CUdpSocket&) = delete;
+
+	public:
+		static COPool<CUdpSocket, std::mutex> m_pool;
 	};
 };

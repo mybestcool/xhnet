@@ -5,7 +5,7 @@
 #include <map>
 #include <functional>
 
-#include <xhhead.h>
+#include "xhhead.h"
 
 namespace xhnet
 {

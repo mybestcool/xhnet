@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <xhhead.h>
+#include "xhhead.h"
 
 #include <string>
 #include <sstream>
@@ -59,9 +59,9 @@ namespace xhnet
 
 	//
 	// 目录， 传入目录编码以系统为系统编码
-	std::string	GetModulePath(void);
-	bool		CreateDirectory(const std::string& path);
-	bool		IsSamePath(const std::string& path1, const std::string& path2);
+	std::string	GetModuleDir(void);
+	bool		MakeDir(const std::string& dir);
+	bool		IsSameDir(const std::string& dir1, const std::string& dir2);
 	// end 目录
 
 
@@ -135,7 +135,7 @@ namespace xhnet
 
 	//
 	// 随机值
-	//
+	// 返回值范围为[min,max)
 	unsigned int GenRandUINT(unsigned int min = 0x0, unsigned int max = 0xffffffff);
 	// end 随机值
 

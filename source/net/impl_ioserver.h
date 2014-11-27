@@ -3,8 +3,9 @@
 
 #include <queue>
 #include <mutex>
-#include <xhnet.h>
 
+#include "xhnet.h"
+#include "xhpool.h"
 #include "impl_tcpsocket.h"
 
 struct event_base;
@@ -77,6 +78,9 @@ namespace xhnet
 	private:
 		CIOServer(const CIOServer&) = delete;
 		CIOServer& operator=(const CIOServer&) = delete;
+
+	public:
+		static COPool<CIOServer, std::mutex> m_pool;
 	};
 };
 

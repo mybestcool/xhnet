@@ -7,7 +7,7 @@ namespace xhnet
 {
 	class CIOServer;
 
-	class CTcpSocket : public ITcpSocket, public CInheritOPool<CTcpSocket, std::mutex>
+	class CTcpSocket : public ITcpSocket
 	{
 	public:
 		enum type
@@ -72,7 +72,7 @@ namespace xhnet
 		void real_fini();
 
 		void on_inter_listen_accept(evutil_socket_t listenfd);
-		void on_inter_accept_accept(evutil_socket_t fd, socketaddr* peeraddr, ev_socklen_t addrlen);
+		void on_inter_accept_accept(evutil_socket_t fd, std::string peerip, unsigned int peerport);
 		void on_inter_recv(short flag);
 		void on_inter_send(short flag);
 		void on_inter_close(int errid, bool bconnecting);
@@ -110,6 +110,11 @@ namespace xhnet
 	private:
 		CTcpSocket(const CTcpSocket&) = delete;
 		CTcpSocket& operator=(const CTcpSocket&) = delete;
+
+	public:
+		static COPool<CTcpSocket, std::mutex> m_pool;
+
+		static CTcpSocket* Create(void);
 	};
 };
 

@@ -67,11 +67,11 @@ namespace xhnet
 		CPageSet& operator=(const CPageSet&) = delete;
 	};
 
-	template<class T, class D>
+	template<class T>
 	class CPagesMap
 	{
 	public:
-		typedef xh_page_map<T, D*>				page_map;
+		typedef xh_page_map<T, CMPage*>			page_map;
 		typedef typename page_map::iterator		page_map_it;
 
 		CPagesMap()
@@ -82,11 +82,11 @@ namespace xhnet
 			Clear();
 		}
 
-		void Push(T key, D* page)
+		void Push(T key, CMPage* page)
 		{
 			m_pages[key] = page;
 		}
-		D* Find(T key)
+		CMPage* Find(T key)
 		{
 			page_map_it it = m_pages.find(key);
 			if (it == m_pages.end())
@@ -96,7 +96,7 @@ namespace xhnet
 
 			return it->second;
 		}
-		D* Pop(T key)
+		CMPage* Pop(T key)
 		{
 			page_map_it it = m_pages.find(key);
 			if (it == m_pages.end())
@@ -104,7 +104,7 @@ namespace xhnet
 				return 0;
 			}
 
-			D* page = it->second;
+			CMPage* page = it->second;
 			m_pages.erase(it);
 			return page;
 		}
@@ -137,29 +137,19 @@ namespace xhnet
 	{
 	public:
 		// 当空闲队列的长度大于DEFAULT_START_RECYCLE_SIZE，之后回收的内存全部返回给系统
-		enum { DEFAULT_START_RECYCLE_SIZE = 10 };
+		enum { DEFAULT_START_RECYCLE_SIZE = 50 };
 
 		CSameSizeMPageMgr(unsigned long block_size, unsigned long align_size, unsigned long recycle_size = DEFAULT_START_RECYCLE_SIZE);
 		~CSameSizeMPageMgr(void);
 
-		void* Allocate(void);
-		void Free(void* ptr);
+		void* AllocateFromPage(CMPage*& allocfrompage);
+		void FreeToPage(void* ptr, CMPage* freetopage);
 
 		void GetMemStat(unsigned long& all, unsigned long& used, unsigned long &free);
 
 		void Set_AllPages(CPageSet* pages)
 		{
 			m_all_pages = pages;
-		}
-
-		void Set_FreePages(CPageList* pages)
-		{
-			m_free_pages = pages;
-		}
-
-		void Set_UsingMap(CPagesMap<void*, CMPage>* usingmap)
-		{
-			m_using_map = usingmap;
 		}
 
 		unsigned long Get_Block_Size(void)
@@ -171,6 +161,11 @@ namespace xhnet
 		{
 			return m_align_size;
 		}
+
+		CMPage*	Get_Cur_AllocPage(void)
+		{
+			return m_cur_allocpage;
+		}
 	private:
 		unsigned long		m_block_size;
 		unsigned long		m_align_size;
@@ -181,13 +176,10 @@ namespace xhnet
 		CPageSet*			m_all_pages;
 
 		// page大小一样的一个page
-		CPageList*			m_free_pages;
-
+		CPageList			m_free_pages;
 		CPageSet			m_using_pages;
+
 		CMPage*				m_cur_allocpage;
-
-		CPagesMap<void*, CMPage>*	m_using_map;
-
 	public:
 		CSameSizeMPageMgr(void) = delete;
 		CSameSizeMPageMgr(const CSameSizeMPageMgr&) = delete;
@@ -197,6 +189,22 @@ namespace xhnet
 	class CMPageMgr
 	{
 	public:
+		struct UsingBlockInfo
+		{
+			CSameSizeMPageMgr*  ppool;
+			CMPage*				ppage;
+
+			UsingBlockInfo(void)
+				: ppool(0), ppage(0)
+			{
+			}
+
+			UsingBlockInfo(CSameSizeMPageMgr* pool, CMPage* page)
+				: ppool(pool), ppage(page)
+			{
+			}
+		};
+
 		CMPageMgr(unsigned long recycle_size = CSameSizeMPageMgr::DEFAULT_START_RECYCLE_SIZE);
 		~CMPageMgr(void);
 
@@ -210,14 +218,11 @@ namespace xhnet
 
 		CPageSet									m_all_pages;
 		
-		// pagesize -> pagelist
-		CPagesMap<unsigned long, CPageList>			m_free_pages;
-
 		// alignedblocksize->mgr
-		CPagesMap<unsigned long, CSameSizeMPageMgr>	m_using_pages;
+		xh_page_map<unsigned long, CSameSizeMPageMgr*>	m_using_pages;
 
 		//
-		CPagesMap<void*, CMPage>					m_using_map;
+		xh_page_map<void*, UsingBlockInfo>			m_using_map;
 
 	public:
 		CMPageMgr(const CMPageMgr&) = delete;

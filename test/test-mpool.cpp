@@ -1,28 +1,15 @@
 
-#include "../include/stdhead.h"
-#include "../include/xhguard.h"
+#include "stdhead.h"
+#include "xh.h"
 
-//#include "../3_libiconv-win32/include/iconv.h"
-//#pragma comment( lib, "../3_libiconv-win32/lib/iconv.lib" )
+#ifdef _PLATFORM_WINDOWS_
+#ifdef _DEBUG
+#pragma comment( lib, "../bins/Debug/xh-net.lib" )
+#else
+#pragma comment( lib, "../bins/Release/xh-net.lib" )
+#endif
+#endif
 
-#include "memory/mpool.h"
-#include "memory/opool.h"
-#include "thread/nullmutex.h"
-
-//bool conv_string(const string& from, const string to, char* in, unsigned int inlen, char* out, unsigned int outlen)
-//{
-//	iconv_t h = iconv_open(to.c_str(), from.c_str());
-//	if ( iconv_t(-1) == h ) return false;
-//
-//	XH_GUARD([&]{ iconv_close(h); });
-//
-//	if (size_t(-1) == iconv(h, (const char **)&in, &inlen, &out, &outlen))
-//	{
-//		return false;
-//	}
-//
-//	return true;
-//}
 
 struct Test0
 {
@@ -45,54 +32,28 @@ struct Test2
 
 int main( int argc, char** argv )
 {
-	//char gbk_1[] = "ÆÆÏþµÄ²©¿Í";
-	//char utf8_1[100] = { 0 };
-	//char gbk_2[100] = { 0 };
+	xhnet::CMPool<xhnet::CNullMutex> mpool;
+	//xhnet::CMPool<std::mutex> mpool;
 
-	//size_t len0 = conv_string("GBK", "UTF-8", gbk_1, strlen(gbk_1), utf8_1, sizeof(utf8_1));
-	//size_t len1 = conv_string("utf-8", "gbk", utf8_1, strlen(utf8_1), gbk_2, sizeof(gbk_2));
+	time_t begin_tm = 0;
+	time_t end_tm = 0;
 
-	//xhnet::CMPool<xhnet::CNullMutex> mpool;
-	xhnet::CMPool<std::mutex> mpool;
+	begin_tm = xhnet::GetNowTime();
+	for (int i = 0; i < 1000; ++i)
+	{
+		mpool.Free( mpool.Allocate<Test0>() );
+		mpool.Free( mpool.Allocate<Test1>() );
+		mpool.Free( mpool.Allocate<Test2>() );
+	}
 
 	vector<Test0*> v0;
 	vector<Test1*> v1;
 	vector<Test2*> v2;
-	for (int i = 0; i < 1000; ++i)
-	{
-		if ( i==17000 )
-		{
-			int c= 100;
-		}
+	end_tm = xhnet::GetNowTime();
 
-		Test0* t0 = mpool.Allocate<Test0>();
-		Test1* t1 = mpool.Allocate<Test1>();
-		Test2* t2 = mpool.Allocate<Test2>();
+	cout << "cost time:" << end_tm - begin_tm << endl;
 
-		v0.push_back(t0);
-		v1.push_back(t1);
-		v2.push_back(t2);
-	}
-
-	for ( auto i:v0 )
-	{
-		mpool.Free(i);
-	}
-
-	for (auto i : v1)
-	{
-		mpool.Free(i);
-	}
-
-	for (auto i : v2)
-	{
-		mpool.Free(i);
-	}
-
-	v0.clear();
-	v1.clear();
-	v2.clear();
-
+	begin_tm = xhnet::GetNowTime();
 	for (int i = 0; i < 1000; ++i)
 	{
 		Test0* t0 = mpool.Allocate<Test0>();
@@ -118,7 +79,41 @@ int main( int argc, char** argv )
 	{
 		mpool.Free(i);
 	}
+	end_tm = xhnet::GetNowTime();
 
+	cout << "cost time:" << end_tm - begin_tm << endl;
+
+	begin_tm = xhnet::GetNowTime();
+	for (int i = 0; i < 1000; ++i)
+	{
+		Test0* t0 = mpool.Allocate<Test0>();
+		Test1* t1 = mpool.Allocate<Test1>();
+		Test2* t2 = mpool.Allocate<Test2>();
+
+		v0.push_back(t0);
+		v1.push_back(t1);
+		v2.push_back(t2);
+	}
+
+	for (auto i : v0)
+	{
+		mpool.Free(i);
+	}
+
+	for (auto i : v1)
+	{
+		mpool.Free(i);
+	}
+
+	for (auto i : v2)
+	{
+		mpool.Free(i);
+	}
+	end_tm = xhnet::GetNowTime();
+
+	cout << "cost time:" << end_tm - begin_tm << endl;
+
+	getchar();
 
 	return 0;
 }
