@@ -26,6 +26,7 @@ namespace xhnet
 		tcp_recvfail_recverr,
 		tcp_sendfail_senderr,
 
+		tcp_close_byreset,
 		tcp_close_bylocal,
 	};
 

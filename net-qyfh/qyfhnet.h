@@ -626,6 +626,7 @@ namespace xhnet_qyfh
 			TCPListenerMap::iterator it = m_listeners.find(socketid);
 			if (it != m_listeners.end())
 			{
+				it->second->Close();
 				it->second->Release();
 				m_listeners.erase(it);
 			}
@@ -644,6 +645,7 @@ namespace xhnet_qyfh
 				TCPServerMap::iterator it = m_servers.find(socketid);
 				if (it != m_servers.end())
 				{
+					it->second->Close();
 					it->second->Release();
 					m_servers.erase(it);
 				}

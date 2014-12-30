@@ -126,10 +126,17 @@ namespace xhnet
 
 	static CNetInit sf_netinit;
 
+	static unsigned int gen_ioserverid()
+	{
+		static std::atomic<unsigned int> gen_id(0);
+		return ++gen_id;
+	}
+
 	CIOServer::CIOServer()
 		: m_evbase(event_base_new())
 		, m_status(status_null)
 		, m_binit(false)
+		, m_id(gen_ioserverid())
 		, m_curpost( 0 )
 		, m_haspostdata( false )
 	{
@@ -216,7 +223,7 @@ namespace xhnet
 			}
 			catch (...)
 			{
-				XH_LOG_ERROR(logname_base, "IOServer Run catch err");
+				XH_LOG_FATAL(logname_base, "[id:" << m_id << "] IOServer Run catch err");
 			}
 		}
 
@@ -240,6 +247,11 @@ namespace xhnet
 		std::lock_guard<std::mutex> guard(m_postmutex);
 		m_postdata[m_curpost].push(io);
 		m_haspostdata = true;
+	}
+
+	unsigned int CIOServer::GetIOServerID(void)
+	{
+		return m_id;
 	}
 
 	void CIOServer::On_Timer(unsigned int timerid, int errid)
@@ -398,7 +410,7 @@ namespace xhnet
 		}
 		catch (...)
 		{
-			XH_LOG_ERROR(logname_base, "IOServer post catch err");
+			XH_LOG_ERROR(logname_base, "[id:"<<m_id<<"] IOServer post catch err");
 		}
 	}
 };

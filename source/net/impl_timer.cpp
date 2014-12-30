@@ -22,10 +22,10 @@ namespace xhnet
 
 	COPool<CTimer, std::mutex> CTimer::m_pool;
 
-	static unsigned int gen_timertid()
+	static unsigned int gen_timerid()
 	{
-		static std::atomic<unsigned int> gen_timerid(0);
-		return ++gen_timerid;
+		static std::atomic<unsigned int> gen_id(0);
+		return ++gen_id;
 	}
 
 	void CTimer::on_timer_callback(evutil_socket_t sock, short flag, void* p)
@@ -39,7 +39,7 @@ namespace xhnet
 
 	CTimer::CTimer(void)
 		: m_status(status_null)
-		, m_id(gen_timertid())
+		, m_id(gen_timerid())
 		, m_io(0)
 		, m_cb(0)
 	{
@@ -110,7 +110,7 @@ namespace xhnet
 
 		if (m_status != status_init)
 		{
-			XH_LOG_ERROR(logname_base, "Timer: " << m_id << " start failed, has start");
+			XH_LOG_ERROR(logname_base, "[id:" << m_id << "] Timer start failed, has start");
 			return;
 		}
 

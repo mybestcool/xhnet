@@ -49,7 +49,7 @@ namespace xhnet
 #ifdef _DEBUG
 		static unsigned int tcpsocket_createcnt = 0;
 		++tcpsocket_createcnt;
-		XH_LOG_INFO(logname_base, "tcpsocket create count:" << tcpsocket_createcnt);
+		XH_LOG_INFO(logname_base, "[id:" << m_id << "] tcpsocket create count:" << tcpsocket_createcnt);
 #endif
 	}
 
@@ -58,7 +58,7 @@ namespace xhnet
 #ifdef _DEBUG
 		static unsigned int tcpsocket_destorycnt = 0;
 		++tcpsocket_destorycnt;
-		XH_LOG_INFO(logname_base, "tcpsocket destory count:" << tcpsocket_destorycnt);
+		XH_LOG_INFO(logname_base, "[id:" << m_id << "] tcpsocket destory count : " << tcpsocket_destorycnt);
 #endif
 	}
 
@@ -72,6 +72,7 @@ namespace xhnet
 		if (!m_io) return false;
 
 		cb->Retain();
+		if (m_lcb) m_lcb->Release();
 		m_lcb = cb;
 		m_type = type_listener;
 		m_binit = true;
@@ -89,6 +90,7 @@ namespace xhnet
 		if (!m_io) return false;
 
 		cb->Retain();
+		if (m_acb) m_acb->Release();
 		m_acb = cb;
 		m_type = type_accepter;
 		m_binit = true;
@@ -106,6 +108,7 @@ namespace xhnet
 		if (!m_io) return false;
 
 		cb->Retain();
+		if (m_ccb) m_ccb->Release();
 		m_ccb = cb;
 		m_type = type_connecter;
 		m_binit = true;
@@ -270,7 +273,7 @@ namespace xhnet
 		ev_socklen_t addrlen = sizeof(bindaddr);
 		if (!ipport2sockaddr(m_localip, m_localport, &bindaddr, addrlen))
 		{
-			XH_LOG_ERROR(logname_base, "tcpsocket listen failed iperr, ip:" << ip << ", port:" << port);
+			XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket listen failed iperr, ip:" << ip << ", port : " << port);
 			on_inter_close(tcp_listenfail_iperr, true);
 			
 			return;
@@ -280,7 +283,7 @@ namespace xhnet
 		evutil_socket_t listener;
 		if ((listener = ::socket(tempsockaddr->sa_family, SOCK_STREAM, 0)) == INVALID_SOCKET)
 		{
-			XH_LOG_ERROR(logname_base, "tcpsocket listen failed ::socket err, ip:" << ip << ", port:" << port);
+			XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket listen failed::socket err, ip:" << ip << ", port : " << port);
 			on_inter_close(tcp_listenfail_createerr, true);
 			
 			return;
@@ -290,7 +293,7 @@ namespace xhnet
 
 		if (::bind(listener, (struct sockaddr *) &bindaddr, addrlen) == SOCKET_ERROR)
 		{
-			XH_LOG_ERROR(logname_base, "tcpsocket listen failed ::bind err, ip:" << ip << ", port:" << port);
+			XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket listen failed::bind err, ip:" << ip << ", port : " << port);
 			on_inter_close(tcp_listenfail_binderr, true);
 			
 			return;
@@ -298,7 +301,7 @@ namespace xhnet
 
 		if (::listen(listener, SOMAXCONN) == SOCKET_ERROR)
 		{
-			XH_LOG_ERROR(logname_base, "tcpsocket listen failed ::listen err, ip:" << ip << ", port:" << port);
+			XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket listen failed::listen err, ip:" << ip << ", port : " << port);
 			on_inter_close(tcp_listenfail_listenerr, true);
 			
 			return;
@@ -323,7 +326,7 @@ namespace xhnet
 
 		m_lcb->On_Listen(GetSocketID(), tcp_ok);
 
-		XH_LOG_INFO(logname_base, "tcpsocket listen succeed, ip:" << ip << ", port:" << port);
+		XH_LOG_INFO(logname_base, "[id:" << m_id << "] tcpsocket listen succeed, ip:" << ip << ", port : " << port);
 	}
 
 	void CTcpSocket::real_connect(std::string ip, unsigned int port)
@@ -340,7 +343,7 @@ namespace xhnet
 		ev_socklen_t addrlen = sizeof(connectaddr);
 		if (!ipport2sockaddr(m_peerip, m_peerport, &connectaddr, addrlen))
 		{
-			XH_LOG_ERROR(logname_base, "tcpsocket connect failed errip, ip:" << ip << ", port:" << port);
+			XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket connect failed errip, ip:" << ip << ", port : " << port);
 			on_inter_close(tcp_connectfail_iperr, true);
 			
 			return;
@@ -350,7 +353,7 @@ namespace xhnet
 		evutil_socket_t connecter;
 		if ((connecter = ::socket(tempsockaddr->sa_family, SOCK_STREAM, 0)) == INVALID_SOCKET)
 		{
-			XH_LOG_ERROR(logname_base, "tcpsocket connect failed ::socket err, ip:" << ip << ", port:" << port);
+			XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket connect failed::socket err, ip:" << ip << ", port : " << port);
 			on_inter_close(tcp_connectfail_createerr, true);
 			
 			return;
@@ -365,7 +368,7 @@ namespace xhnet
 			if ( !isnoblockerr() )
 			{
 				closetcpsocket(connecter);
-				XH_LOG_ERROR(logname_base, "tcpsocket connect failed ::connect err, ip:" << ip << ", port:" << port);
+				XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket connect failed::connect err, ip:" << ip << ", port : " << port);
 				on_inter_close(tcp_connectfail_connecterr, true);
 				
 				return;
@@ -393,7 +396,7 @@ namespace xhnet
 		writeval.tv_usec = 0;
 		m_io->Add_Event(&m_ev_write, &writeval);
 
-		XH_LOG_INFO(logname_base, "tcpsocket connect succeed, ip:" << ip << ", port:" << port);
+		XH_LOG_INFO(logname_base, "[id:" << m_id << "] tcpsocket connect succeed, ip:" << ip << ", port : " << port);
 	}
 
 	void CTcpSocket::real_fini()
@@ -438,7 +441,7 @@ namespace xhnet
 		m_binit = false;
 		on_inter_close(tcp_close_bylocal, false);
 
-		XH_LOG_INFO(logname_base, "tcpsocket fini");
+		XH_LOG_INFO(logname_base, "[id:" << m_id << "] tcpsocket fini");
 
 		{
 			switch (m_type)
@@ -480,7 +483,7 @@ namespace xhnet
 		evutil_socket_t newfd = ::accept(listenfd, (struct sockaddr*)&acceptaddr, &addrlen);
 		if (newfd == INVALID_SOCKET)
 		{
-			XH_LOG_ERROR(logname_base, "tcpsocket listener ::accept failed, ip:" << m_localip << ", port:" << m_localport);
+			XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket listener::accept failed, ip:" << m_localip << ", port : " << m_localport);
 			return;
 		}
 
@@ -499,7 +502,7 @@ namespace xhnet
 			std::string peerip;
 			unsigned int peerport = 0;
 
-			sockaddr2ipport(&acceptaddr, addrlen, m_peerip, m_peerport);
+			sockaddr2ipport(&acceptaddr, addrlen, peerip, peerport);
 
 			newsocket->Retain();
 			newsocket->m_io->Post(std::bind(&CTcpSocket::on_inter_accept_accept, newsocket, newfd, peerip, peerport));
@@ -507,7 +510,33 @@ namespace xhnet
 		else
 		{
 			closetcpsocket(newfd);
-			XH_LOG_ERROR(logname_base, "tcpsocket listener ITcpSocketCB::On_Accept failed or not be accepted by user, ip:" << m_localip << ", port:" << m_localport);
+			switch (newsocket->m_type)
+			{
+			case type_listener:
+				if (newsocket->m_lcb)
+				{
+					newsocket->m_lcb->Release();
+					newsocket->m_lcb = 0;
+				}
+				break;
+			case type_accepter:
+				if (newsocket->m_acb)
+				{
+					newsocket->m_acb->Release();
+					newsocket->m_acb = 0;
+				}
+				break;
+			case type_connecter:
+				if (newsocket->m_ccb)
+				{
+					newsocket->m_ccb->Release();
+					newsocket->m_ccb = 0;
+				}
+				break;
+			default:
+				break;
+			}
+			XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket listener ITcpSocketCB::On_Accept failed or not be accepted by user, ip:" << m_localip << ", port : " << m_localport);
 		}
 	}
 
@@ -544,7 +573,7 @@ namespace xhnet
 		writeval.tv_usec = 0;
 		m_io->Add_Event(&m_ev_write, &writeval);
 
-		XH_LOG_INFO(logname_base, "tcpsocket accept succeed, peerip:" << m_peerip << ", peerport:" << m_peerport);
+		XH_LOG_INFO(logname_base, "[id:" << m_id << "] tcpsocket accept succeed, peerip:" << m_peerip << ", peerport : " << m_peerport);
 	}
 
 	void CTcpSocket::on_inter_recv(short flag)
@@ -560,7 +589,7 @@ namespace xhnet
 		int recvlen = ::recv(m_socket, recvbuff->GetCurWrite(), recvbuff->AvailWrite(), 0);
 		if (recvlen == 0)
 		{
-			XH_LOG_INFO(logname_base, "tcpsocket ::recv failed, closed by peer");
+			XH_LOG_INFO(logname_base, "[id:" << m_id << "] tcpsocket::recv failed, closed by peer");
 			on_inter_close(tcp_recvfail_closedbypeer, false);
 			return;
 		}
@@ -572,7 +601,7 @@ namespace xhnet
 			}
 			else
 			{
-				XH_LOG_WARN(logname_base, "tcpsocket ::recv failed, recv -1");
+				XH_LOG_WARN(logname_base, "[id:" << m_id << "] tcpsocket::recv failed, recv - 1");
 				on_inter_close(tcp_recvfail_recverr, false);
 			}
 			return;
@@ -656,7 +685,7 @@ namespace xhnet
 			}
 			else
 			{
-				XH_LOG_ERROR(logname_base, "tcpsocket connect timeout");
+				XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket connect timeout");
 				on_inter_close(tcp_connectfail_timeout, true);
 
 				return;
@@ -667,6 +696,13 @@ namespace xhnet
 			while (!m_wait_send.empty())
 			{
 				CIOBuffer* buff = m_wait_send.front();
+
+				if ( buff->AvailRead()==0 )
+				{
+					XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket::send close cmd");
+					on_inter_close(tcp_close_byreset, false);
+					return;
+				}
 
 				bool bneedbreak = false;
 				int sendlen = ::send(m_socket, buff->GetCurRead(), buff->AvailRead(), 0);
@@ -683,7 +719,7 @@ namespace xhnet
 					}
 					else
 					{
-						XH_LOG_ERROR(logname_base, "tcpsocket ::send failed send -1");
+						XH_LOG_ERROR(logname_base, "[id:" << m_id << "] tcpsocket::send failed send - 1");
 						on_inter_close(tcp_sendfail_senderr, false);
 						return;
 					}
@@ -861,7 +897,7 @@ namespace xhnet
 			break;
 		}
 
-		XH_LOG_INFO(logname_base, "tcpsocket closed by errid:"<<errid);
+		XH_LOG_INFO(logname_base, "[id:" << m_id << "] tcpsocket closed by errid : "<<errid);
 	}
 };
 

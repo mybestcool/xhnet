@@ -1,0 +1,6 @@
+
+$#include "main-qyfh.h"
+
+$#include "test-qyfh.h"
+
+$pfile "test-qyfh.pkg"

@@ -33,6 +33,7 @@ namespace xhnet
 
 		virtual void Post(postio io);
 
+		virtual unsigned int GetIOServerID(void);
 	public:
 		virtual void On_Timer(unsigned int timerid, int errid);
 
@@ -63,6 +64,8 @@ namespace xhnet
 		::event_base*		m_evbase;
 		unsigned char		m_status;
 		bool				m_binit;
+
+		unsigned int		m_id;
 
 		std::mutex			m_postmutex;
 		int					m_curpost;

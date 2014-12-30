@@ -57,7 +57,7 @@
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../../include;../../dependencies/windows;../../dependencies/windows/libevent/include;../../dependencies/windows/libiconv/include;../../dependencies/windows/log4cplus/include;../../net-qyfh</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../dependencies/windows;../../dependencies/windows/libevent/include;../../dependencies/windows/libiconv/include;../../dependencies/windows/log4cplus/include;../../net-qyfh;../../dependencies/source/tolua;../../dependencies/windows/luajit/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,7 +78,7 @@
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../../include;../../dependencies/windows;../../dependencies/windows/libevent/include;../../dependencies/windows/libiconv/include;../../dependencies/windows/log4cplus/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../net-qyfh;../../dependencies/windows;../../dependencies/windows/libevent/include;../../dependencies/windows/libiconv/include;../../dependencies/windows/log4cplus/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -89,9 +89,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dependencies\source\tolua\tolua_event.c" />
+    <ClCompile Include="..\..\dependencies\source\tolua\tolua_is.c" />
+    <ClCompile Include="..\..\dependencies\source\tolua\tolua_map.c" />
+    <ClCompile Include="..\..\dependencies\source\tolua\tolua_push.c" />
+    <ClCompile Include="..\..\dependencies\source\tolua\tolua_to.c" />
+    <ClCompile Include="..\..\test\luaengine.cpp" />
+    <ClCompile Include="..\..\test\main-qyfh.cpp" />
     <ClCompile Include="..\..\test\test-qyfh.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dependencies\source\tolua\tolua++.h" />
+    <ClInclude Include="..\..\dependencies\source\tolua\tolua_event.h" />
+    <ClInclude Include="..\..\dependencies\windows\luajit\include\lauxlib.h" />
+    <ClInclude Include="..\..\dependencies\windows\luajit\include\lua.h" />
+    <ClInclude Include="..\..\dependencies\windows\luajit\include\luaconf.h" />
+    <ClInclude Include="..\..\dependencies\windows\luajit\include\lualib.h" />
     <ClInclude Include="..\..\net-qyfh\msgstream.h" />
     <ClInclude Include="..\..\net-qyfh\mstimer.h" />
     <ClInclude Include="..\..\net-qyfh\qyfh.h" />
@@ -101,6 +114,9 @@
     <ClInclude Include="..\..\net-qyfh\socketlistener.h" />
     <ClInclude Include="..\..\net-qyfh\socketserver.h" />
     <ClInclude Include="..\..\net-qyfh\threadio.h" />
+    <ClInclude Include="..\..\test\luaengine.h" />
+    <ClInclude Include="..\..\test\main-qyfh.h" />
+    <ClInclude Include="..\..\test\test-qyfh.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -31,5 +31,7 @@ namespace xhnet
 		virtual bool IsFinshed(void) = 0;
 
 		virtual void Post(postio io) = 0;
+
+		virtual unsigned int GetIOServerID(void) = 0;
 	};
 };

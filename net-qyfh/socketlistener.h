@@ -7,7 +7,7 @@
 
 namespace xhnet_qyfh
 {
-	unsigned int sc_listener_socket_count = 0;
+	static unsigned int sc_listener_socket_count = 0;
 
 	template<class User>
 	class CTcpSocketListener : public ICBTcpListener

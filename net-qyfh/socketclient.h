@@ -6,7 +6,7 @@
 
 namespace xhnet_qyfh
 {
-	unsigned int sc_client_socket_count = 0;
+	static unsigned int sc_client_socket_count = 0;
 
 	template<class User, class CMessageHead>
 	class CTcpSocketClient : public ICBTcpConneter, public ICBTimer
@@ -296,8 +296,10 @@ namespace xhnet_qyfh
 					return 0;
 				}
 
-				// 由于ITcpSocket保存了本对象的计数，当次计数release前，都会处理掉CIOBuffer
-				// 所以保证了m_msgmempool，m_msgobjpool的必定存在。
+				// 由于
+				// 1.CTcpSocket保存了本对象的计数，当CTcpSocket计数release前，都会处理掉接收和发送的CIOBuffer
+				// 2.CNetIO保存了本对象的计数，调用了onclose后，会析构本对象，即处理完接收消息
+				// 从而保证了m_msgmempool，m_msgobjpool的必定存在。
 				// 所以可以这样使用
 				io_buf->Set_DestoryCB([&](CPPRef* ref)
 				{
@@ -411,7 +413,7 @@ namespace xhnet_qyfh
 				if (!buff)
 					return;
 
-				m_socket->Async_RecvSome(buff);
+				m_socket->Async_Recv(buff);
 				buff->Release();
 			}
 		}
@@ -460,7 +462,7 @@ namespace xhnet_qyfh
 
 				recvbuf->Set_DestoryCB([&](CPPRef* ref){ m_msgobjpool->Delete_Object(dynamic_cast<CIOBuffer*>(ref)); });
 
-				m_socket->Async_RecvSome(recvbuf);
+				m_socket->Async_Send(recvbuf);
 
 				recvbuf->Release();
 			}

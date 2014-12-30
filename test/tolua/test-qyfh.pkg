@@ -1,0 +1,22 @@
+
+$#include "qyfh.h"
+
+$using namespace xhnet_qyfh;
+
+class CTestNetIO
+{
+	CTestNetIO();
+	~CTestNetIO();
+
+	static CTestNetIO* GetNetIO();
+
+	std::string GetConnectIP();
+
+	unsigned int GetConnectPort();
+
+	void Start(const std::string& listenip, unsigned int listenport, const std::string& connectip, unsigned int connectport);
+
+	void Close();
+
+	void Stop();
+};
