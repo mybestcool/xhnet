@@ -1,6 +1,7 @@
 
 #include "log/actionstat.h"
 #include "xhutility.h"
+#include "xhlog.h"
 
 namespace xhnet
 {
@@ -49,4 +50,11 @@ namespace xhnet
 		}
 	}
 	
+	void CActionStat::LogInfoActions()
+	{
+		for (auto it = m_actions.begin(); it != m_actions.end(); ++it)
+		{
+			XH_LOG_INFO(xhnet::logname_base, "[Actions] fun:"<<it->first<<"\tcalled times:"<<it->second.m_totalcnt<<"\t used time(ms):"<<it->second.m_totaltime );
+		}
+	}
 };

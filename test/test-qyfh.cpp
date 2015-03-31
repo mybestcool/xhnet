@@ -137,7 +137,6 @@ void CTestNetIO::client_on_heart(int userid, unsigned int socketid)
 	XH_LOG_INFO(logname_base, "client onheart:" << socketid);
 }
 
-
 int main(int argv, char** argc)
 {
 #if defined _PLATFORM_WINDOWS_

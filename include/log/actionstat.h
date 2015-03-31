@@ -47,6 +47,7 @@ namespace xhnet
 
 		void AddAction(const COneAction& action);
 		void TraverseActions(std::function<void(const std::string& action, const CActionRecord& record)> callf);
+		void LogInfoActions();
 
 	private:
 		CActionStat();

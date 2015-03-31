@@ -36,7 +36,7 @@ namespace xhnet
 			}
 		}
 		
-		XH_LOG_INFO(::xhnet::logname_trace, out.str());
+		XH_LOG_ERROR(::xhnet::logname_trace, out.str());
 	}
 
 	void ensure_handle(const assert_context & context)

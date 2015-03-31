@@ -103,7 +103,7 @@ namespace xhnet
 
 		unsigned int LengthWrite()
 		{
-			return m_pwrite - m_pread;
+			return m_pwrite - m_pbase;
 		}
 
 		unsigned int AvailWrite()
